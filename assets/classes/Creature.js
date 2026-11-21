@@ -35,6 +35,10 @@ export default class Creature {
   }
 
   graphic() {
-    this.element.style.backgroundImage = `url(assets/images/${this.creatureType}s/${this.type}.png)`;
+    const url = new URL(
+      `assets/images/${this.creatureType}s/${this.type}.png`,
+      document.baseURI,
+    );
+    this.element.style.backgroundImage = `url("${url}")`;
   }
 }
