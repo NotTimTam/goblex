@@ -8,5 +8,6 @@ export default class Animal extends Creature {
 
     super(i, "animal");
     this.type = type;
+    this.i = i;
   }
 }

@@ -63,8 +63,9 @@ main.board button.tile {
 
   font-size: 0.25rem;
 
-  width: 48px;
-  height: 48px;
+  --size: 72px;
+  width: var(--size);
+  height: var(--size);
   background-size: 400% 100%;
   background-repeat: no-repeat;
   background-position: calc(var(--frame, 0) / 3 * 100%) 0;
@@ -79,4 +80,9 @@ main.board button.tile:hover {
 
 main.board button.tile:active {
   transform: translateY(1px);
+}
+
+main.board button.tile.exit {
+  --accent: #559955;
+  background-color: #5599553c;
 }
