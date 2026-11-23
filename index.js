@@ -7,6 +7,6 @@ const noise = createNoise2D(alea(Date.now()));
 
 const board = new Board({
   noise,
-  delayGoblinTurn: false,
+  // delayGoblinTurn: false,
   level: levels.base[0],
 });

@@ -33,9 +33,12 @@ export default class Board {
         : tiles;
     this.size = this.level.length;
 
-    this.turnDisplay = document.querySelector("p.turn-display");
-    this.board = document.querySelector("div.board");
+    this.game = document.querySelector("main.game");
+    this.turnDisplay = this.game.querySelector("p.turn-display");
+    this.board = this.game.querySelector("div.board");
     this.boardWidth = width;
+
+    this.turns = 0;
 
     this.creatures = [];
 
@@ -50,9 +53,16 @@ export default class Board {
     });
   }
 
+  get skipTurnButton() {
+    return this.game.querySelector("button#skip-turn");
+  }
+
   set turn(t) {
+    this.turns++;
+
     this.__lastClick = null;
     this.__rawTurn = t;
+    if (this.skipTurnButton) this.skipTurnButton.remove();
     document.activeElement.blur();
 
     this.board.setAttribute("turn", t);
@@ -71,7 +81,19 @@ export default class Board {
         () => this.goblinTurn(),
         this.delayGoblinTurn ? Math.random() * 1000 + 200 : 0,
       );
-    } else this.turnData = {};
+    } else {
+      // Setup player turn.
+      this.turnData = {};
+
+      const button = document.createElement("button");
+      button.id = "skip-turn";
+      button.innerHTML = "SKIP TURN";
+      button.onclick = () => {
+        if (this.turn === "player") this.turn = "goblin";
+      };
+
+      this.game.appendChild(button);
+    }
 
     this.turnDisplay.innerHTML = t === "goblin" ? "GOBLIN'S TURN" : "YOUR TURN";
   }
@@ -180,6 +202,14 @@ export default class Board {
 
     const creature = this.getCreature(i);
 
+    const setupAttack = (creature) => {
+      const possibleEnemies = creature.neighbors.filter(
+        (c) => c.creatureType === "goblin",
+      );
+
+      console.log(possibleEnemies);
+    };
+
     // Tile is empty.
     if (!creature) {
       // If an animal is selected, lets try to move it.
@@ -203,7 +233,7 @@ export default class Board {
           if (!lastClick.neighbors.find((n) => n.creatureType === "goblin")) {
             this.turn = "goblin";
             return;
-          }
+          } else setupAttack(lastClick);
         } else {
           this.logs.push("Tile too far...");
           return lastClick.element.focus();
@@ -214,11 +244,7 @@ export default class Board {
 
       if (creature.creatureType === "animal") {
         // Handle animal click.
-        const possibleEnemies = creature.neighbors.filter(
-          (c) => c.creatureType === "goblin",
-        );
-
-        console.log(possibleEnemies);
+        setupAttack(creature);
       }
       // else if (creature.neighbors.find((n) => n.creatureType === "animal")) {
       //   console.log("TRIGGERATTACK");

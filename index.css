@@ -18,6 +18,10 @@
   -webkit-user-drag: none;
 }
 
+button {
+  cursor: pointer;
+}
+
 html {
   background: #000;
   color: #fff;
@@ -42,6 +46,8 @@ main.game {
   gap: 0.5rem;
 
   align-items: center;
+
+  position: relative;
 }
 
 p.turn-display {
@@ -73,8 +79,6 @@ div.board button.tile {
   transition: 0.0333s ease-in-out;
   transition-property:
     transform, box-shadow, border-width, background-color, opacity;
-
-  cursor: pointer;
 
   font-size: 0.25rem;
 
@@ -212,4 +216,20 @@ footer.logs p.log {
   100% {
     opacity: 0;
   }
+}
+
+button#skip-turn {
+  border: 1px solid #fff;
+  padding: 0.25rem 0.5rem;
+  font-size: 1rem;
+
+  position: absolute;
+  top: calc(100% + 1rem);
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+button#skip-turn:hover:not(:active) {
+  background-color: #fff;
+  color: #000;
 }
