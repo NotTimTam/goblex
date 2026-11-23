@@ -6,9 +6,5 @@ const noise = createNoise2D(alea(Date.now()));
 
 const board = new Board({
   noise,
-  level: {
-    exits: 1,
-    animals: 3,
-    goblins: 4,
-  },
+  level: [0, 1, 0, 0, "grunt", 0, 0, "frog", 0],
 });

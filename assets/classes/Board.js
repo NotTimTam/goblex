@@ -1,11 +1,11 @@
 import { EMOTIONS } from "../util/creatures.js";
 import Animal from "./Animal.js";
 import Goblin from "./Goblin.js";
-import { placeTiles } from "../util/placement.js";
 import {
   animals as animalTypes,
   goblins as goblinTypes,
 } from "../util/creatures.js";
+import Logs from "./Logs.js";
 
 export default class Board {
   /**
@@ -14,18 +14,22 @@ export default class Board {
    * @param {NoiseFunction2D} config.noise
    */
   constructor(config) {
-    const { nTiles = 12 * 12, level, noise } = config;
+    const { level, noise } = config;
 
-    this.size = nTiles;
+    this.size = level.length;
     this.noise = noise;
     this.level = level;
 
     this.board = document.querySelector("main.board");
-    this.boardWidth = Math.ceil(Math.sqrt(nTiles));
+    this.boardWidth = Math.ceil(Math.sqrt(this.size));
 
     this.creatures = [];
 
+    this.logs = new Logs();
+
     this.buildBoard();
+
+    this.logs.push("Move all animals to the exit.");
   }
 
   toIndex = (x, y) => y * this.boardWidth + x;
@@ -76,15 +80,6 @@ export default class Board {
     );
   }
 
-  place(options) {
-    return placeTiles({
-      width: this.boardWidth,
-      size: this.size,
-      noise: this.noise,
-      ...options,
-    });
-  }
-
   buildBoard() {
     const { level, size, noise } = this;
 
@@ -102,55 +97,61 @@ export default class Board {
       this.board.appendChild(button);
     }
 
-    // Place exits
-    this.exits = this.place({
-      count: Math.min(level.exits ?? 1, size),
-      threshold: 0.8,
-      spread: 1,
+    // Build level items.
+    level.forEach((n, i) => {
+      if (n === 1) {
+        const tile = this.getTile(i);
+
+        tile.classList.toggle("exit", true);
+      } else if (typeof n === "string") {
+        (Object.keys(animalTypes).includes(n) ? this.animal : this.goblin).bind(
+          this,
+        )(i, n);
+      }
     });
 
-    for (const exit of this.exits) {
-      const tile = this.getTile(exit);
+    // // Place exits
+    // this.exits = this.place({
+    //   count: Math.min(level.exits ?? 1, size),
+    //   threshold: 0.8,
+    //   spread: 1,
+    // });
 
-      tile.classList.toggle("exit", true);
-    }
+    // for (const exit of this.exits) {
+    //   const tile = this.getTile(exit);
 
-    // Place animals
-    const animals = this.place({
-      count: level.animals ?? 0,
-      exclude: this.exits,
-      near: [{ tiles: this.exits, weight: -1 }],
-      spread: 0.5,
-    });
+    //   tile.classList.toggle("exit", true);
+    // }
 
-    const aTs = Object.keys(animalTypes);
-    for (const animal of animals) {
-      const n = noise(...this.toXY(animal));
+    // // Place animals
+    // const animals = this.place({
+    //   count: level.animals ?? 0,
+    //   exclude: this.exits,
+    //   near: [{ tiles: this.exits, weight: -1 }],
+    //   spread: 0.5,
+    // });
 
-      const type = aTs[Math.abs(Math.floor(n * aTs.length))];
+    // const aTs = Object.keys(animalTypes);
 
-      this.animal(animal, type);
-    }
+    // // Place goblins
+    // const goblins = this.place({
+    //   count: level.goblins ?? 0,
+    //   exclude: [...this.exits, ...animals],
+    //   near: [
+    //     { tiles: this.exits, weight: 0.75 },
+    //     { tiles: animals, weight: 0.8 },
+    //   ],
+    //   spread: -0.2,
+    //   adjacent: "allow",
+    // });
 
-    // Place goblins
-    const goblins = this.place({
-      count: level.goblins ?? 0,
-      exclude: [...this.exits, ...animals],
-      near: [
-        { tiles: this.exits, weight: 0.75 },
-        { tiles: animals, weight: 0.8 },
-      ],
-      spread: -0.2,
-      adjacent: "allow",
-    });
+    // const gTs = Object.keys(goblinTypes);
+    // for (const goblin of goblins) {
+    //   const n = noise(...this.toXY(goblin));
 
-    const gTs = Object.keys(goblinTypes);
-    for (const goblin of goblins) {
-      const n = noise(...this.toXY(goblin));
+    //   const type = gTs[Math.abs(Math.floor(n * gTs.length))];
 
-      const type = gTs[Math.abs(Math.floor(n * gTs.length))];
-
-      this.goblin(goblin, type);
-    }
+    //   this.goblin(goblin, type);
+    // }
   }
 }
