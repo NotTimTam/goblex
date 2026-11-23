@@ -67,10 +67,19 @@ main.board button.tile {
   --size: 72px;
   width: var(--size);
   height: var(--size);
-  background-size: auto 100%;
   background-repeat: no-repeat;
-  background-position: calc(var(--frame, 0) / 3 * 100%) 0;
+
   image-rendering: pixelated;
+}
+
+main.board button.tile[type="animal"] {
+  background-size: 400% 100%;
+  background-position: calc(var(--frame, 0) / 3 * 100%) 0;
+}
+
+main.board button.tile[type="goblin"] {
+  background-size: 500% 100%;
+  background-position: calc(var(--frame, 0) / 4 * 100%) 0;
 }
 
 main.board button.tile:hover {

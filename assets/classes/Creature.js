@@ -1,5 +1,6 @@
 export default class Creature {
-  constructor(i, creatureType) {
+  constructor(board, i, creatureType) {
+    this.board = board;
     this.creatureType = creatureType;
 
     this.__rawI = null;
@@ -25,7 +26,7 @@ export default class Creature {
   }
 
   set frame(n) {
-    this.__rawFrame = Math.max(Math.min(n, 3));
+    this.__rawFrame = n;
     this.element.style.setProperty("--frame", this.__rawFrame);
   }
 
@@ -35,8 +36,15 @@ export default class Creature {
     );
   }
 
+  get neighbors() {
+    return this.board.creatures.filter(
+      (f) => f !== this && this.board.distance(f.i, this.i, "chebyshev") < 2,
+    );
+  }
+
   clear() {
     this.element.style = null;
+    this.element.removeAttribute("type");
   }
 
   graphic() {
@@ -44,6 +52,7 @@ export default class Creature {
       `assets/images/${this.creatureType}s/${this.type}.png`,
       document.baseURI,
     );
+    this.element.setAttribute("type", this.creatureType);
     this.element.style.backgroundImage = `url("${url}")`;
   }
 }

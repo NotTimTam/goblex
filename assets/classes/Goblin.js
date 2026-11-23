@@ -2,16 +2,25 @@ import { EMOTIONS, goblins } from "../util/creatures.js";
 import Creature from "./Creature.js";
 
 export default class Goblin extends Creature {
-  constructor(i, type) {
+  constructor(board, i, type) {
     if (!(type in goblins)) throw new Error("No goblin exists with that type.");
 
-    super(i, "goblin");
+    super(board, i, "goblin");
     this.type = type;
     this.i = i;
   }
 
-  animate(neighbors) {
-    if (neighbors.find((c) => c.creatureType === "animal"))
+  animate() {
+    if (this.neighbors.find((c) => c.creatureType === "animal"))
       this.frame = EMOTIONS.scheming;
+    else this.frame = EMOTIONS.normal;
+  }
+
+  possibleMoves() {
+    const possibleMoves = [];
+
+    console.log(this.neighbors);
+
+    return possibleMoves;
   }
 }

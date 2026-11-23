@@ -54,14 +54,7 @@ export default class Board {
 
     this.logs.push(`${t === "player" ? "Your" : "Gobby"} turn...`);
 
-    this.creatures.forEach((creature) =>
-      creature.animate(
-        this.creatures.filter(
-          (f) =>
-            f !== creature && this.distance(f.i, creature.i, "chebyshev") < 2,
-        ),
-      ),
-    );
+    this.creatures.forEach((creature) => creature.animate());
 
     if (t === "goblin") {
       if (this.delayGoblinTurn)
@@ -135,7 +128,7 @@ export default class Board {
   }
 
   goblin(i, type) {
-    const creature = new Goblin(i, type);
+    const creature = new Goblin(this, i, type);
 
     this.creatures.push(creature);
 
@@ -145,7 +138,7 @@ export default class Board {
   }
 
   animal(i, type) {
-    const creature = new Animal(i, type);
+    const creature = new Animal(this, i, type);
 
     this.creatures.push(creature);
 
@@ -156,10 +149,13 @@ export default class Board {
     const possibleMoves = [];
 
     for (const goblin of this.goblins) {
-      console.log(goblin);
+      possibleMoves.push(...goblin.possibleMoves());
     }
 
-    console.log(possibleMoves[0]);
+    if (!possibleMoves.length) {
+      this.logs.push("Gobbies thought really hard but couldn't do sh*t...");
+      this.turn = "player";
+    }
   }
 
   click(i) {
