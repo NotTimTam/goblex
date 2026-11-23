@@ -69,8 +69,8 @@ export default class Creature {
     this.element.innerHTML = null;
   }
 
-  setHealthbar() {
-    const healthbar =
+  get healthbar() {
+    return (
       this.element.querySelector("div.healthbar") ||
       (() => {
         const healthbar = document.createElement("div");
@@ -84,9 +84,8 @@ export default class Creature {
         this.element.appendChild(healthbar);
 
         return healthbar;
-      })();
-
-    healthbar.children[0].style.width = `${(this.health / this.maxHealth) * 100}%`;
+      })()
+    );
   }
 
   graphic() {
@@ -101,7 +100,8 @@ export default class Creature {
   }
 
   genericAnimate() {
-    this.setHealthbar();
+    this.healthbar.children[0].style.width = `${Math.max((this.health / this.maxHealth) * 100, 0)}%`;
+
     if (this.dead) this.element.setAttribute("dead", true);
   }
 }

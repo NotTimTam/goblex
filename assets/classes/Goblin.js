@@ -52,6 +52,11 @@ export default class Goblin extends Creature {
   move({ move, target }) {
     if (move === "attack") {
       target.health -= this.attack;
+      target.element.addEventListener("animationend", (e) => {
+        if (e.animationName === "shake")
+          e.target.classList.toggle("hit", false);
+      });
+      target.element.classList.toggle("hit", true);
 
       this.board.logs.push(
         `${capitalizeWords(this.type)} attacked ${target.type} for ${this.attack}PTS`,
