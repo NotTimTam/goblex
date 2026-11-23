@@ -33,7 +33,23 @@ body {
   display: grid;
 }
 
-main.board {
+main.game {
+  align-self: center;
+  justify-self: center;
+
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+
+  align-items: center;
+}
+
+p.turn-display {
+  font-weight: bold;
+  color: orange;
+}
+
+div.board {
   width: max-content;
   max-width: 100%;
 
@@ -43,16 +59,13 @@ main.board {
   display: grid;
   gap: 6px;
 
-  align-self: center;
-  justify-self: center;
-
   align-items: center;
   align-content: center;
   justify-content: center;
   justify-items: center;
 }
 
-main.board button.tile {
+div.board button.tile {
   --accent: white;
   border: 0.5px solid var(--accent);
   box-shadow: 0px 0px 5px color-mix(in srgb, var(--accent) 33.333%, transparent);
@@ -72,33 +85,33 @@ main.board button.tile {
   image-rendering: pixelated;
 }
 
-main.board button.tile[type="animal"] {
+div.board button.tile[type="animal"] {
   background-size: 400% 100%;
   background-position: calc(var(--frame, 0) / 3 * 100%) 0;
 }
 
-main.board button.tile[type="goblin"] {
+div.board button.tile[type="goblin"] {
   background-size: 500% 100%;
   background-position: calc(var(--frame, 0) / 4 * 100%) 0;
 }
 
-main.board button.tile:hover {
+div.board button.tile:hover {
   --accent: dodgerblue;
   box-shadow: 0px 0px 10px
     color-mix(in srgb, var(--accent) 33.333%, transparent);
 }
 
-main.board button.tile:active {
+div.board button.tile:active {
   transform: translateY(1px);
 }
 
-main.board[turn="player"] button.tile:focus {
+div.board[turn="player"] button.tile:focus {
   transform: scale(1.05);
   --accent: orange;
   border-width: 1.5px;
 }
 
-main.board button.tile.exit {
+div.board button.tile.exit {
   --accent: #559955;
   background-color: #5599553c;
 }

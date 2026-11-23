@@ -33,7 +33,8 @@ export default class Board {
         : tiles;
     this.size = this.level.length;
 
-    this.board = document.querySelector("main.board");
+    this.turnDisplay = document.querySelector("p.turn-display");
+    this.board = document.querySelector("div.board");
     this.boardWidth = width;
 
     this.creatures = [];
@@ -67,6 +68,8 @@ export default class Board {
         this.delayGoblinTurn ? Math.random() * 1000 + 200 : 0,
       );
     }
+
+    this.turnDisplay.innerHTML = t === "goblin" ? "GOBLIN'S TURN" : "YOUR TURN";
   }
 
   get turn() {
@@ -121,7 +124,7 @@ export default class Board {
   getTile(i, y) {
     if (y) i = this.toIndex(i, y);
 
-    return document.querySelector(`main.board button.tile:nth-child(${i + 1})`);
+    return this.board.querySelector(`button.tile:nth-child(${i + 1})`);
   }
 
   getCreature(i, y) {

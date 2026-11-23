@@ -31,8 +31,8 @@ export default class Creature {
   }
 
   get element() {
-    return document.querySelector(
-      `main.board button.tile:nth-child(${this.i + 1})`,
+    return this.board.board.querySelector(
+      `button.tile:nth-child(${this.i + 1})`,
     );
   }
 
