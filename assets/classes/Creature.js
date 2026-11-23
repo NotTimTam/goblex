@@ -86,7 +86,7 @@ export default class Creature {
         return healthbar;
       })();
 
-    healthbar.children[0].style.width = `${this.health / this.maxHealth}%`;
+    healthbar.children[0].style.width = `${(this.health / this.maxHealth) * 100}%`;
   }
 
   graphic() {
