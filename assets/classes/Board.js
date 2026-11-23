@@ -11,14 +11,20 @@ import Logs from "./Logs.js";
 export default class Board {
   /**
    * @param {*} config
-   * @param {number} config.nTiles
+   * @param {*} config.level
+   * @param {Array<number>} config.level.tiles
+   * @param {number} config.level.width
    * @param {NoiseFunction2D} config.noise
+   * @param {boolean} config.delayGoblinTurn
    */
   constructor(config) {
     const {
       level: { width, tiles },
       noise,
+      delayGoblinTurn = true,
     } = config;
+
+    this.delayGoblinTurn = delayGoblinTurn;
 
     this.size = tiles.length;
     this.noise = noise;
@@ -56,10 +62,27 @@ export default class Board {
         ),
       ),
     );
+
+    if (t === "goblin") {
+      if (this.delayGoblinTurn)
+        this.logs.push(`The goblin(s) are considering their options...`);
+      setTimeout(
+        () => this.goblinTurn(),
+        this.delayGoblinTurn ? Math.random() * 1000 + 200 : 0,
+      );
+    }
   }
 
   get turn() {
     return this.__rawTurn || "player";
+  }
+
+  get animals() {
+    return this.creatures.filter((c) => c.creatureType === "animal");
+  }
+
+  get goblins() {
+    return this.creatures.filter((c) => c.creatureType === "goblin");
   }
 
   toIndex = (x, y) => y * this.boardWidth + x;
@@ -127,6 +150,16 @@ export default class Board {
     this.creatures.push(creature);
 
     return creature;
+  }
+
+  goblinTurn() {
+    const possibleMoves = [];
+
+    for (const goblin of this.goblins) {
+      console.log(goblin);
+    }
+
+    console.log(possibleMoves[0]);
   }
 
   click(i) {
