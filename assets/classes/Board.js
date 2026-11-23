@@ -71,7 +71,7 @@ export default class Board {
         () => this.goblinTurn(),
         this.delayGoblinTurn ? Math.random() * 1000 + 200 : 0,
       );
-    }
+    } else this.turnData = {};
 
     this.turnDisplay.innerHTML = t === "goblin" ? "GOBLIN'S TURN" : "YOUR TURN";
   }
@@ -183,18 +183,27 @@ export default class Board {
     // Tile is empty.
     if (!creature) {
       // If an animal is selected, lets try to move it.
-
-      if (lastClick && lastClick.creatureType === "animal" && !lastClick.dead) {
+      if (
+        lastClick &&
+        lastClick.creatureType === "animal" &&
+        !lastClick.dead &&
+        !this.turnData.moved
+      ) {
         const dt = this.distance(lastClick.i, i, "chebyshev");
 
         if (dt < 2) {
+          // Move the animal.
           this.logs.push(
             `Moved ${lastClick.type} to (${this.toXY(lastClick.i).join(", ")})`,
           );
           lastClick.i = i;
+          this.turnData.moved = true;
 
-          this.turn = "goblin";
-          return;
+          // If the possibility for attack after move didn't open up, we end turn.
+          if (!lastClick.neighbors.find((n) => n.creatureType === "goblin")) {
+            this.turn = "goblin";
+            return;
+          }
         } else {
           this.logs.push("Tile too far...");
           return lastClick.element.focus();
@@ -205,9 +214,15 @@ export default class Board {
 
       if (creature.creatureType === "animal") {
         // Handle animal click.
-      } else {
-        // Handle goblin click.
+        const possibleEnemies = creature.neighbors.filter(
+          (c) => c.creatureType === "goblin",
+        );
+
+        console.log(possibleEnemies);
       }
+      // else if (creature.neighbors.find((n) => n.creatureType === "animal")) {
+      //   console.log("TRIGGERATTACK");
+      // }
     }
 
     this.__lastClick = i;

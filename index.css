@@ -98,17 +98,17 @@ div.board button.tile[type="goblin"] {
   background-position: calc(var(--frame, 0) / 4 * 100%) 0;
 }
 
-div.board button.tile:hover {
+div.board[turn="player"] button.tile:hover[type]:not([dead]) {
   --accent: dodgerblue;
   box-shadow: 0px 0px 10px
     color-mix(in srgb, var(--accent) 33.333%, transparent);
 }
 
-div.board button.tile:active {
+div.board[turn="player"] button.tile:active[type]:not([dead]) {
   transform: translateY(1px);
 }
 
-div.board[turn="player"] button.tile:focus[type]:not([dead]) {
+div.board[turn="player"] button.tile:focus[type="animal"]:not([dead]) {
   transform: scale(1.05);
   --accent: orange;
   border-width: 1.5px;
