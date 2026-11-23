@@ -155,6 +155,12 @@ export default class Board {
     if (!possibleMoves.length) {
       this.logs.push("Gobbies thought really hard but couldn't do sh*t...");
       this.turn = "player";
+    } else {
+      const move = possibleMoves.sort((a, b) => b.value - a.value)[0];
+
+      move.goblin.move(move);
+
+      this.turn = "player";
     }
   }
 

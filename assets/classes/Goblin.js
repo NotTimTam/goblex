@@ -1,4 +1,6 @@
 import { EMOTIONS, goblins } from "../util/creatures.js";
+import { capitalizeWords } from "../util/display.js";
+
 import Creature from "./Creature.js";
 
 export default class Goblin extends Creature {
@@ -19,8 +21,30 @@ export default class Goblin extends Creature {
   possibleMoves() {
     const possibleMoves = [];
 
-    console.log(this.neighbors);
+    const edibles = this.neighbors
+      .filter((n) => n.creatureType === "animal")
+      .sort(
+        (a, b) =>
+          this.board.distance(this.i, a.i) - this.board.distance(this.i, b.i),
+      );
+
+    if (edibles.length)
+      possibleMoves.push({
+        goblin: this,
+        move: "attack",
+        target: edibles[0],
+        value: 100,
+      });
 
     return possibleMoves;
+  }
+
+  move({ move, target }) {
+    if (move === "attack") {
+      target.health -= 5;
+      this.board.logs.push(
+        `${capitalizeWords(this.type)} attacked ${target.type} for ${5}pts`,
+      );
+    }
   }
 }
