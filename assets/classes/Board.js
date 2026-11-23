@@ -1,4 +1,5 @@
 import { EMOTIONS } from "../util/creatures.js";
+
 import Animal from "./Animal.js";
 import Goblin from "./Goblin.js";
 import {
@@ -29,11 +30,62 @@ export default class Board {
 
     this.buildBoard();
 
-    this.logs.push("Move all animals to the exit.");
+    addEventListener("keydown", (e) => {
+      if (this.turn !== "player") return;
+
+      if (e.key === "Escape") this.selectionFocus = null;
+    });
+  }
+
+  set turn(t) {
+    this.__rawTurn = t;
+    document.activeElement.blur();
+
+    this.board.setAttribute("turn", t);
+
+    this.logs.push(`${t === "player" ? "Your" : "Gobby"} turn...`);
+  }
+
+  get turn() {
+    return this.__rawTurn || "player";
   }
 
   toIndex = (x, y) => y * this.boardWidth + x;
   toXY = (i) => [i % this.boardWidth, Math.floor(i / this.boardWidth)];
+  /**
+   * Distance between two board indices.
+   *
+   * Modes:
+   * - "manhattan": dx + dy. Counts orthogonal steps only (up, down, left, right),
+   *   so a diagonal neighbor is 2 away. Use for 4-directional movement.
+   * - "chebyshev": max(dx, dy). Counts steps where diagonals cost the same as
+   *   orthogonal moves, so a diagonal neighbor is 1 away. Use for 8-directional
+   *   movement (like a chess king).
+   * - "euclidean": sqrt(dx² + dy²). Straight-line distance, so a diagonal neighbor
+   *   is ~1.41 away. Use for ranges, radii, or line-of-sight, not step counts.
+   *
+   * @param {number} a - Index of the first tile.
+   * @param {number} b - Index of the second tile.
+   * @param {"manhattan" | "chebyshev" | "euclidean"} [mode="manhattan"] - How
+   *   distance is measured (see above). Defaults to "manhattan".
+   * @returns {number} The distance between the two tiles.
+   */
+  distance = (a, b, mode = "manhattan") => {
+    const [x1, y1] = this.toXY(a);
+    const [x2, y2] = this.toXY(b);
+
+    const dx = Math.abs(x2 - x1);
+    const dy = Math.abs(y2 - y1);
+
+    switch (mode) {
+      case "chebyshev":
+        return Math.max(dx, dy);
+      case "euclidean":
+        return Math.hypot(dx, dy);
+      default:
+        return dx + dy;
+    }
+  };
 
   getTile(i, y) {
     if (y) i = this.toIndex(i, y);
@@ -66,18 +118,43 @@ export default class Board {
   }
 
   click(i) {
+    if (this.turn !== "player") return;
+
+    const lastClick =
+      !isNaN(this.__lastClick) && this.getCreature(this.__lastClick);
+
     const creature = this.getCreature(i);
 
-    if (!creature) return;
+    // Tile is empty.
+    if (!creature) {
+      // If an animal is selected, lets try to move it.
 
-    console.log(
-      "Clicked",
-      Object.keys(EMOTIONS)[creature.frame],
-      creature.creatureType,
-      creature.type,
-      "at",
-      i,
-    );
+      if (lastClick && lastClick.creatureType === "animal") {
+        const dt = this.distance(lastClick.i, i, "chebyshev");
+
+        if (dt < 2) {
+          this.logs.push(
+            `Moved ${lastClick.creatureType} to (${this.toXY(lastClick.i).join(", ")})`,
+          );
+          lastClick.i = i;
+
+          this.turn = "goblin";
+        } else {
+          this.logs.push("Tile too far...");
+          return lastClick.element.focus();
+        }
+      }
+    } else {
+      // Tile is not empty.
+
+      if (creature.creatureType === "animal") {
+        // Handle animal click.
+      } else {
+        // Handle goblin click.
+      }
+    }
+
+    this.__lastClick = i;
   }
 
   buildBoard() {
@@ -110,48 +187,7 @@ export default class Board {
       }
     });
 
-    // // Place exits
-    // this.exits = this.place({
-    //   count: Math.min(level.exits ?? 1, size),
-    //   threshold: 0.8,
-    //   spread: 1,
-    // });
-
-    // for (const exit of this.exits) {
-    //   const tile = this.getTile(exit);
-
-    //   tile.classList.toggle("exit", true);
-    // }
-
-    // // Place animals
-    // const animals = this.place({
-    //   count: level.animals ?? 0,
-    //   exclude: this.exits,
-    //   near: [{ tiles: this.exits, weight: -1 }],
-    //   spread: 0.5,
-    // });
-
-    // const aTs = Object.keys(animalTypes);
-
-    // // Place goblins
-    // const goblins = this.place({
-    //   count: level.goblins ?? 0,
-    //   exclude: [...this.exits, ...animals],
-    //   near: [
-    //     { tiles: this.exits, weight: 0.75 },
-    //     { tiles: animals, weight: 0.8 },
-    //   ],
-    //   spread: -0.2,
-    //   adjacent: "allow",
-    // });
-
-    // const gTs = Object.keys(goblinTypes);
-    // for (const goblin of goblins) {
-    //   const n = noise(...this.toXY(goblin));
-
-    //   const type = gTs[Math.abs(Math.floor(n * gTs.length))];
-
-    //   this.goblin(goblin, type);
-    // }
+    this.logs.push("Kill all goblins or move all animals to the exit.");
+    this.turn = "player";
   }
 }

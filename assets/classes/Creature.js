@@ -11,7 +11,12 @@ export default class Creature {
   }
 
   set i(n) {
+    if (this.element) {
+      this.clear();
+    }
+
     this.__rawI = n;
+
     this.graphic();
   }
 

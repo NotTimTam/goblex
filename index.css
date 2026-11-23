@@ -82,6 +82,12 @@ main.board button.tile:active {
   transform: translateY(1px);
 }
 
+main.board[turn="player"] button.tile:focus {
+  transform: scale(1.05);
+  --accent: orange;
+  border-width: 1.5px;
+}
+
 main.board button.tile.exit {
   --accent: #559955;
   background-color: #5599553c;

@@ -7,11 +7,11 @@ export default class Logs {
     this.element.innerHTML = null;
   }
 
-  push(t) {
+  push(...t) {
     const p = document.createElement("p");
     p.className = "log";
 
-    p.innerHTML = t;
+    p.innerHTML = t.join(" ");
 
     this.element.appendChild(p);
 
