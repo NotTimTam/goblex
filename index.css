@@ -55,6 +55,8 @@ p.turn-display {
   color: orange;
 }
 
+/* Board and Tiles */
+
 div.board {
   width: max-content;
   max-width: 100%;
@@ -76,7 +78,7 @@ div.board button.tile {
   border: 0.5px solid var(--accent);
   box-shadow: 0px 0px 5px color-mix(in srgb, var(--accent) 33.333%, transparent);
 
-  transition: 0.0333s ease-in-out;
+  transition: 0.1s ease-in-out;
   transition-property:
     transform, box-shadow, border-width, background-color, opacity;
 
@@ -102,17 +104,17 @@ div.board button.tile[type="goblin"] {
   background-position: calc(var(--frame, 0) / 4 * 100%) 0;
 }
 
-div.board[turn="player"] button.tile:hover[type]:not([dead]) {
+div.board[turn="player"] button.tile:hover[type]:not(.dead) {
   --accent: dodgerblue;
   box-shadow: 0px 0px 10px
     color-mix(in srgb, var(--accent) 33.333%, transparent);
 }
 
-div.board[turn="player"] button.tile:active[type]:not([dead]) {
+div.board[turn="player"] button.tile:active[type]:not(.dead) {
   transform: translateY(1px);
 }
 
-div.board[turn="player"] button.tile:focus[type="animal"]:not([dead]) {
+div.board[turn="player"] button.tile:focus[type="animal"]:not(.dead) {
   transform: scale(1.05);
   --accent: orange;
   border-width: 1.5px;
@@ -123,8 +125,25 @@ div.board button.tile.exit {
   background-color: #5599553c;
 }
 
-div.board button.tile[dead] {
+div.board button.tile.wall {
+  background-image: url("data:image/svg+xml,%3Csvg width='40' height='12' viewBox='0 0 40 12' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 6.172L6.172 0h5.656L0 11.828V6.172zm40 5.656L28.172 0h5.656L40 6.172v5.656zM6.172 12l12-12h3.656l12 12h-5.656L20 3.828 11.828 12H6.172zm12 0L20 10.172 21.828 12h-3.656z' fill='%239c92ac' fill-opacity='0.4' fill-rule='evenodd'/%3E%3C/svg%3E");
+  background-repeat: repeat;
+  background-size: 16px;
+
+  cursor: not-allowed;
+}
+
+div.board button.tile.dead {
   opacity: 0.5;
+}
+
+div.board[turn="player"] button.tile.attackable:not(.dead) {
+  box-shadow: 0px 0px 10px tomato;
+  border-color: tomato;
+}
+
+div.board[turn="player"] button.tile.attackable:hover:not(.dead) {
+  box-shadow: 0px 0px 20px tomato;
 }
 
 div.board button.tile div.healthbar {
@@ -190,6 +209,7 @@ div.board button.tile.hit {
   }
 }
 
+/* Logs */
 footer.logs {
   position: absolute;
   bottom: 0;
@@ -218,7 +238,8 @@ footer.logs p.log {
   }
 }
 
-button#end-turn {
+/* Buttons */
+button.game-trigger {
   border: 1px solid #fff;
   padding: 0.25rem 0.5rem;
   font-size: 1rem;
@@ -229,7 +250,47 @@ button#end-turn {
   transform: translateX(-50%);
 }
 
-button#end-turn:hover:not(:active) {
+button.game-trigger:hover:not(:active) {
   background-color: #fff;
   color: #000;
+}
+
+/* Fight */
+main.game:has(div.fight) div.board,
+main.game:has(div.fight) button.game-trigger {
+  pointer-events: none;
+}
+
+main.game:has(div.fight) {
+  position: static;
+}
+
+div.fight {
+  position: absolute;
+  border: 1px solid #fff;
+
+  z-index: 2;
+
+  max-width: 100%;
+  max-height: 100%;
+
+  width: 600px;
+  height: 500px;
+
+  top: 50%;
+  left: 50%;
+
+  transform: translate(-50%, -50%);
+
+  background: #00000077;
+  backdrop-filter: blur(4px);
+
+  animation: fight-appear 1s ease-in-out;
+}
+
+@keyframes fight-appear {
+  0% {
+    border-radius: 128px;
+    transform: translate(-50%, 100%) scale(0);
+  }
 }

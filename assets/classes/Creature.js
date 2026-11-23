@@ -12,6 +12,14 @@ export default class Creature {
   }
 
   set health(n) {
+    if (n < this.__rawHealth) {
+      this.element.addEventListener("animationend", (e) => {
+        if (e.animationName === "shake")
+          e.target.classList.toggle("hit", false);
+      });
+      this.element.classList.toggle("hit", true);
+    }
+
     this.__rawHealth = n;
   }
 
@@ -65,7 +73,7 @@ export default class Creature {
   clear() {
     this.element.style = null;
     this.element.removeAttribute("type");
-    this.element.removeAttribute("dead");
+    this.element.classList.toggle("dead", false);
     this.element.innerHTML = null;
   }
 
@@ -102,6 +110,6 @@ export default class Creature {
   genericAnimate() {
     this.healthbar.children[0].style.width = `${Math.max((this.health / this.maxHealth) * 100, 0)}%`;
 
-    if (this.dead) this.element.setAttribute("dead", true);
+    if (this.dead) this.element.classList.toggle("dead", true);
   }
 }

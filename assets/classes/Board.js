@@ -7,6 +7,8 @@ import {
   goblins as goblinTypes,
 } from "../util/creatures.js";
 import Logs from "./Logs.js";
+import { capitalizeWords } from "../util/display.js";
+import Fight from "./Fight.js";
 
 export default class Board {
   /**
@@ -39,7 +41,11 @@ export default class Board {
     this.boardWidth = width;
 
     this.turns = 0;
+    this.turnData = {};
 
+    this.exits = [];
+    this.escapes = 0;
+    this.walls = [];
     this.creatures = [];
 
     this.logs = new Logs();
@@ -63,39 +69,68 @@ export default class Board {
     this.__lastClick = null;
     this.__rawTurn = t;
     if (this.endTurnButton) this.endTurnButton.remove();
+    if (this.turnData && this.turnData.clearAttack) this.turnData.clearAttack();
     document.activeElement.blur();
 
-    this.board.setAttribute("turn", t);
+    this.animateCreatures();
 
-    this.logs.push(`${t === "player" ? "Your" : "Gobby"} turn...`);
+    // Before triggering turn, test if game is in a win or loss state.
+    const end = this.endCondition;
+    if (end) this.__rawTurn = end;
 
-    this.creatures.forEach((creature) => {
-      creature.genericAnimate();
-      creature.animate();
-    });
+    // For styling purposes, indicate the turn to the board.
+    this.board.setAttribute("turn", this.__rawTurn);
 
-    if (t === "goblin") {
-      if (this.delayGoblinTurn)
-        this.logs.push(`The goblin(s) are considering their options...`);
-      setTimeout(
-        () => this.goblinTurn(),
-        this.delayGoblinTurn ? Math.random() * 1000 + 200 : 0,
-      );
-    } else {
-      // Setup player turn.
-      this.turnData = {};
+    // Clear previous turn's data.
+    this.turnData = {};
+
+    if (end) {
+      this.logs.push(end === "win" ? "You win!" : "You lost!");
+      this.turnDisplay.innerHTML = end === "win" ? "YOU WIN!" : "YOU LOSE :(";
 
       const button = document.createElement("button");
-      button.id = "end-turn";
-      button.innerHTML = "END TURN";
-      button.onclick = () => {
-        if (this.turn === "player") this.turn = "goblin";
-      };
+      button.className = "game-trigger";
+
+      if (end === "win") {
+        button.id = "next-level";
+        button.innerHTML = "NEXT LEVEL";
+        button.onclick = () => {
+          alert("NOT IMPLEMENTED");
+        };
+      } else {
+        button.id = "retry";
+        button.innerHTML = "RETRY";
+        button.onclick = () => {
+          alert("NOT IMPLEMENTED");
+        };
+      }
 
       this.game.appendChild(button);
-    }
+    } else {
+      this.logs.push(`${t === "player" ? "Your" : "Gobby"} turn...`);
+      this.turnDisplay.innerHTML =
+        t === "goblin" ? "GOBLIN'S TURN" : "YOUR TURN";
 
-    this.turnDisplay.innerHTML = t === "goblin" ? "GOBLIN'S TURN" : "YOUR TURN";
+      if (t === "goblin") {
+        if (this.delayGoblinTurn)
+          this.logs.push(`The goblin(s) are considering their options...`);
+        setTimeout(
+          () => this.goblinTurn(),
+          this.delayGoblinTurn ? Math.random() * 1000 + 200 : 0,
+        );
+      } else if (t === "player") {
+        // Setup player turn.
+        const button = document.createElement("button");
+        button.className = "game-trigger";
+        button.id = "end-turn";
+        button.innerHTML = "END TURN";
+        button.onclick = () => {
+          if (this.turn === "player") this.turn = "goblin";
+        };
+
+        this.game.appendChild(button);
+      }
+    }
   }
 
   get turn() {
@@ -108,6 +143,28 @@ export default class Board {
 
   get goblins() {
     return this.creatures.filter((c) => c.creatureType === "goblin");
+  }
+
+  get endCondition() {
+    /*
+    WIN CONDITIONS:
+    - All animals have escaped.
+    or
+    - Some animals have escaped, and the rest are dead.
+    or
+    - All goblins are dead.
+    */
+    if (!this.animals.length || !this.goblins.length) return "win";
+
+    if (this.escapes && !this.animals.find((a) => !a.dead)) return "win";
+
+    /*
+    LOSS CONDITIONS:
+    - All animals are dead.
+    */
+    if (!this.animals.find((a) => !a.dead)) return "loss";
+
+    return false;
   }
 
   toIndex = (x, y) => y * this.boardWidth + x;
@@ -178,7 +235,7 @@ export default class Board {
   goblinTurn() {
     const possibleMoves = [];
 
-    for (const goblin of this.goblins) {
+    for (const goblin of this.goblins.filter((g) => !g.dead)) {
       possibleMoves.push(...goblin.possibleMoves());
     }
 
@@ -194,6 +251,46 @@ export default class Board {
     }
   }
 
+  animateCreatures() {
+    this.creatures.forEach((creature) => {
+      creature.genericAnimate();
+      creature.animate();
+    });
+  }
+
+  canAnimalAttack(animal) {
+    return (
+      !animal.dead &&
+      animal.neighbors.some(
+        (creature) => creature.creatureType === "goblin" && !creature.dead,
+      )
+    );
+  }
+
+  hasPossibleAnimalAttack() {
+    return this.animals.some((animal) => this.canAnimalAttack(animal));
+  }
+
+  triggerAttack(creature) {
+    const attackingAnimals = creature.neighbors.filter(
+      (a) => a.creatureType === "animal" && !a.dead,
+    );
+
+    if (!attackingAnimals.length) return;
+
+    this.logs.push(
+      `Your ${attackingAnimals.map((a) => a.type).join(", ")} ${attackingAnimals.length > 1 ? "are" : "is"} attacking a ${creature.type} goblin!`,
+    );
+
+    this.turnData.fight = new Fight(this);
+
+    this.turnData.fight.start();
+
+    // creature.health -= 5;
+
+    // this.turn = "goblin";
+  }
+
   click(i) {
     if (this.turn !== "player") return;
 
@@ -203,13 +300,44 @@ export default class Board {
     const creature = this.getCreature(i);
 
     const setupAttack = (creature) => {
+      this.turnData.clearAttack?.();
+
       const possibleEnemies = creature.neighbors.filter(
-        (c) => c.creatureType === "goblin",
+        (c) => c.creatureType === "goblin" && !c.dead,
       );
 
-      // throw new Error(
-      //   "Here, we first highlight what can be attacked, and allow users to trigger an attack.",
-      // );
+      const selectedElement = creature.element;
+
+      const clearAttack = () => {
+        possibleEnemies.forEach((enemy) =>
+          enemy.element.classList.remove("attackable"),
+        );
+        selectedElement.removeEventListener("blur", keepFocus);
+      };
+
+      const keepFocus = (event) => {
+        const isAttackTarget =
+          event.relatedTarget?.classList.contains("attackable");
+
+        if (
+          isAttackTarget &&
+          this.turn === "player" &&
+          this.turnData.clearAttack === clearAttack
+        ) {
+          selectedElement.focus();
+        }
+      };
+
+      this.turnData.clearAttack = clearAttack;
+
+      possibleEnemies.forEach((enemy) =>
+        enemy.element.classList.add("attackable"),
+      );
+
+      if (possibleEnemies.length) {
+        selectedElement.addEventListener("blur", keepFocus);
+        selectedElement.focus();
+      }
     };
 
     // Tile is empty.
@@ -224,18 +352,30 @@ export default class Board {
         const dt = this.distance(lastClick.i, i, "chebyshev");
 
         if (dt < 2) {
+          if (this.walls.includes(i)) {
+            this.logs.push("This is a wall...");
+            return lastClick.element.focus();
+          }
+
           // Move the animal.
           this.logs.push(
             `Moved ${lastClick.type} to (${this.toXY(lastClick.i).join(", ")})`,
           );
+          this.turnData.clearAttack?.();
           lastClick.i = i;
           this.turnData.moved = true;
 
-          // If the possibility for attack after move didn't open up, we end turn.
-          if (!lastClick.neighbors.find((n) => n.creatureType === "goblin")) {
+          // Check if the player moved to an exit.
+          if (this.exits.includes(i)) lastClick.exit();
+
+          this.animateCreatures();
+
+          if (!this.hasPossibleAnimalAttack()) {
             this.turn = "goblin";
             return;
-          } else setupAttack(lastClick);
+          }
+
+          setupAttack(lastClick);
         } else {
           this.logs.push("Tile too far...");
           return lastClick.element.focus();
@@ -247,10 +387,12 @@ export default class Board {
       if (creature.creatureType === "animal" && !creature.dead) {
         // Handle animal click.
         setupAttack(creature);
+      } else if (
+        creature.element.classList.contains("attackable") &&
+        !creature.dead
+      ) {
+        this.triggerAttack(creature);
       }
-      // else if (creature.neighbors.find((n) => n.creatureType === "animal")) {
-      //   console.log("TRIGGERATTACK");
-      // }
     }
 
     this.__lastClick = i;
@@ -275,14 +417,28 @@ export default class Board {
 
     // Build level items.
     level.forEach((n, i) => {
-      if (n === 1) {
-        const tile = this.getTile(i);
+      switch (n) {
+        case 1:
+          const exit = this.getTile(i);
 
-        tile.classList.toggle("exit", true);
-      } else if (typeof n === "string") {
-        (Object.keys(animalTypes).includes(n) ? this.animal : this.goblin).bind(
-          this,
-        )(i, n);
+          exit.classList.toggle("exit", true);
+          this.exits.push(i);
+          break;
+
+        case 2:
+          const wall = this.getTile(i);
+          wall.classList.toggle("wall", true);
+          this.walls.push(i);
+          break;
+
+        case 0:
+          break;
+
+        default:
+          (Object.keys(animalTypes).includes(n)
+            ? this.animal
+            : this.goblin
+          ).bind(this)(i, n);
       }
     });
 

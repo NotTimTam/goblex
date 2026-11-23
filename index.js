@@ -8,5 +8,5 @@ const noise = createNoise2D(alea(Date.now()));
 const board = new Board({
   noise,
   // delayGoblinTurn: false,
-  level: levels.base[0],
+  level: levels.base[1],
 });

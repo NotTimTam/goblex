@@ -19,11 +19,19 @@ export default class Goblin extends Creature {
   }
 
   animate() {
+    const FEAR_THRESHHOLD = 2;
+
+    const neighbors = this.neighbors.filter((c) => !c.dead);
+    const animals = neighbors.filter((c) => c.creatureType === "animal").length;
+    const allies = neighbors.filter((c) => c.creatureType === "goblin").length;
+
+    const scared = animals - allies >= FEAR_THRESHHOLD;
+
     if (this.dead) this.frame = EMOTIONS.dead;
     else if (this.lastKill) this.frame = EMOTIONS.happy;
-    else if (this.neighbors.find((c) => c.creatureType === "animal"))
-      this.frame = EMOTIONS.scheming;
-    else this.frame = EMOTIONS.normal;
+    else if (animals) {
+      this.frame = scared ? EMOTIONS.scared : EMOTIONS.scheming;
+    } else this.frame = EMOTIONS.normal;
   }
 
   possibleMoves() {
@@ -32,7 +40,7 @@ export default class Goblin extends Creature {
     const possibleMoves = [];
 
     const edibles = this.neighbors
-      .filter((n) => n.creatureType === "animal")
+      .filter((n) => n.creatureType === "animal" && !n.dead)
       .sort(
         (a, b) =>
           this.board.distance(this.i, a.i) - this.board.distance(this.i, b.i),
@@ -52,14 +60,9 @@ export default class Goblin extends Creature {
   move({ move, target }) {
     if (move === "attack") {
       target.health -= this.attack;
-      target.element.addEventListener("animationend", (e) => {
-        if (e.animationName === "shake")
-          e.target.classList.toggle("hit", false);
-      });
-      target.element.classList.toggle("hit", true);
 
       this.board.logs.push(
-        `${capitalizeWords(this.type)} attacked ${target.type} for ${this.attack}PTS`,
+        `${capitalizeWords(this.type)} attacked ${target.type} for ${this.attack}HP`,
       );
 
       if (target.health <= 0) {
