@@ -53,8 +53,8 @@ export default class Board {
     });
   }
 
-  get skipTurnButton() {
-    return this.game.querySelector("button#skip-turn");
+  get endTurnButton() {
+    return this.game.querySelector("button#end-turn");
   }
 
   set turn(t) {
@@ -62,7 +62,7 @@ export default class Board {
 
     this.__lastClick = null;
     this.__rawTurn = t;
-    if (this.skipTurnButton) this.skipTurnButton.remove();
+    if (this.endTurnButton) this.endTurnButton.remove();
     document.activeElement.blur();
 
     this.board.setAttribute("turn", t);
@@ -86,8 +86,8 @@ export default class Board {
       this.turnData = {};
 
       const button = document.createElement("button");
-      button.id = "skip-turn";
-      button.innerHTML = "SKIP TURN";
+      button.id = "end-turn";
+      button.innerHTML = "END TURN";
       button.onclick = () => {
         if (this.turn === "player") this.turn = "goblin";
       };
@@ -207,7 +207,9 @@ export default class Board {
         (c) => c.creatureType === "goblin",
       );
 
-      console.log(possibleEnemies);
+      // throw new Error(
+      //   "Here, we first highlight what can be attacked, and allow users to trigger an attack.",
+      // );
     };
 
     // Tile is empty.
@@ -242,7 +244,7 @@ export default class Board {
     } else {
       // Tile is not empty.
 
-      if (creature.creatureType === "animal") {
+      if (creature.creatureType === "animal" && !creature.dead) {
         // Handle animal click.
         setupAttack(creature);
       }

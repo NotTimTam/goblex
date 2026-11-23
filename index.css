@@ -218,7 +218,7 @@ footer.logs p.log {
   }
 }
 
-button#skip-turn {
+button#end-turn {
   border: 1px solid #fff;
   padding: 0.25rem 0.5rem;
   font-size: 1rem;
@@ -229,7 +229,7 @@ button#skip-turn {
   transform: translateX(-50%);
 }
 
-button#skip-turn:hover:not(:active) {
+button#end-turn:hover:not(:active) {
   background-color: #fff;
   color: #000;
 }
