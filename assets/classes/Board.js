@@ -26,9 +26,12 @@ export default class Board {
 
     this.delayGoblinTurn = delayGoblinTurn;
 
-    this.size = tiles.length;
     this.noise = noise;
-    this.level = tiles;
+    this.level =
+      typeof tiles === "string"
+        ? tiles.split(",").map((c) => (!isNaN(+c) ? +c : c))
+        : tiles;
+    this.size = this.level.length;
 
     this.board = document.querySelector("main.board");
     this.boardWidth = width;
