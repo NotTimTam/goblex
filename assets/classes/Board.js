@@ -51,6 +51,7 @@ export default class Board {
   }
 
   set turn(t) {
+    this.__lastClick = null;
     this.__rawTurn = t;
     document.activeElement.blur();
 
@@ -58,7 +59,10 @@ export default class Board {
 
     this.logs.push(`${t === "player" ? "Your" : "Gobby"} turn...`);
 
-    this.creatures.forEach((creature) => creature.animate());
+    this.creatures.forEach((creature) => {
+      creature.genericAnimate();
+      creature.animate();
+    });
 
     if (t === "goblin") {
       if (this.delayGoblinTurn)
@@ -138,8 +142,6 @@ export default class Board {
 
     this.creatures.push(creature);
 
-    if (i === 0) console.log(creature.element);
-
     return creature;
   }
 
@@ -182,16 +184,17 @@ export default class Board {
     if (!creature) {
       // If an animal is selected, lets try to move it.
 
-      if (lastClick && lastClick.creatureType === "animal") {
+      if (lastClick && lastClick.creatureType === "animal" && !lastClick.dead) {
         const dt = this.distance(lastClick.i, i, "chebyshev");
 
         if (dt < 2) {
           this.logs.push(
-            `Moved ${lastClick.creatureType} to (${this.toXY(lastClick.i).join(", ")})`,
+            `Moved ${lastClick.type} to (${this.toXY(lastClick.i).join(", ")})`,
           );
           lastClick.i = i;
 
           this.turn = "goblin";
+          return;
         } else {
           this.logs.push("Tile too far...");
           return lastClick.element.focus();

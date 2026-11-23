@@ -71,7 +71,8 @@ div.board button.tile {
   box-shadow: 0px 0px 5px color-mix(in srgb, var(--accent) 33.333%, transparent);
 
   transition: 0.0333s ease-in-out;
-  transition-property: transform, box-shadow, border-width, background-color;
+  transition-property:
+    transform, box-shadow, border-width, background-color, opacity;
 
   cursor: pointer;
 
@@ -105,7 +106,7 @@ div.board button.tile:active {
   transform: translateY(1px);
 }
 
-div.board[turn="player"] button.tile:focus {
+div.board[turn="player"] button.tile:focus[type]:not([dead]) {
   transform: scale(1.05);
   --accent: orange;
   border-width: 1.5px;
@@ -114,6 +115,10 @@ div.board[turn="player"] button.tile:focus {
 div.board button.tile.exit {
   --accent: #559955;
   background-color: #5599553c;
+}
+
+div.board button.tile[dead] {
+  opacity: 0.5;
 }
 
 footer.logs {

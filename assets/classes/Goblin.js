@@ -7,18 +7,28 @@ export default class Goblin extends Creature {
   constructor(board, i, type) {
     if (!(type in goblins)) throw new Error("No goblin exists with that type.");
 
+    const config = goblins[type];
+
     super(board, i, "goblin");
     this.type = type;
     this.i = i;
+
+    this.health = config.health;
+    this.maxHealth = config.health;
+    this.attack = config.attack;
   }
 
   animate() {
-    if (this.neighbors.find((c) => c.creatureType === "animal"))
+    if (this.dead) this.frame = EMOTIONS.dead;
+    else if (this.lastKill) this.frame = EMOTIONS.happy;
+    else if (this.neighbors.find((c) => c.creatureType === "animal"))
       this.frame = EMOTIONS.scheming;
     else this.frame = EMOTIONS.normal;
   }
 
   possibleMoves() {
+    delete this.lastKill;
+
     const possibleMoves = [];
 
     const edibles = this.neighbors
@@ -41,10 +51,15 @@ export default class Goblin extends Creature {
 
   move({ move, target }) {
     if (move === "attack") {
-      target.health -= 5;
+      target.health -= this.attack;
+
       this.board.logs.push(
-        `${capitalizeWords(this.type)} attacked ${target.type} for ${5}pts`,
+        `${capitalizeWords(this.type)} attacked ${target.type} for ${this.attack}PTS`,
       );
+
+      if (target.health <= 0) {
+        this.lastKill = true;
+      }
     }
   }
 }
