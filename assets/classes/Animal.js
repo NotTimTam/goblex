@@ -1,4 +1,4 @@
-import { animals } from "../util/creatures.js";
+import { animals, EMOTIONS } from "../util/creatures.js";
 import Creature from "./Creature.js";
 
 export default class Animal extends Creature {
@@ -9,5 +9,10 @@ export default class Animal extends Creature {
     super(i, "animal");
     this.type = type;
     this.i = i;
+  }
+
+  animate(neighbors) {
+    if (neighbors.find((c) => c.creatureType === "goblin"))
+      this.frame = EMOTIONS.scared;
   }
 }

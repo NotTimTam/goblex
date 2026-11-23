@@ -3,6 +3,7 @@ export const EMOTIONS = {
   scared: 1,
   dead: 2,
   happy: 3,
+  scheming: 4,
 };
 
 export const animals = {

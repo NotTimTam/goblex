@@ -15,14 +15,17 @@ export default class Board {
    * @param {NoiseFunction2D} config.noise
    */
   constructor(config) {
-    const { level, noise } = config;
+    const {
+      level: { width, tiles },
+      noise,
+    } = config;
 
-    this.size = level.length;
+    this.size = tiles.length;
     this.noise = noise;
-    this.level = level;
+    this.level = tiles;
 
     this.board = document.querySelector("main.board");
-    this.boardWidth = Math.ceil(Math.sqrt(this.size));
+    this.boardWidth = width;
 
     this.creatures = [];
 
@@ -44,6 +47,15 @@ export default class Board {
     this.board.setAttribute("turn", t);
 
     this.logs.push(`${t === "player" ? "Your" : "Gobby"} turn...`);
+
+    this.creatures.forEach((creature) =>
+      creature.animate(
+        this.creatures.filter(
+          (f) =>
+            f !== creature && this.distance(f.i, creature.i, "chebyshev") < 2,
+        ),
+      ),
+    );
   }
 
   get turn() {
