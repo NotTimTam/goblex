@@ -20,6 +20,11 @@ const fight = new Fight(
     new Animal(board, 0, "duck"),
     new Animal(board, 0, "penguin"),
     new Animal(board, 0, "giraffe"),
+    new Animal(board, 0, "giraffe"),
+    new Animal(board, 0, "giraffe"),
+    new Animal(board, 0, "giraffe"),
+    new Animal(board, 0, "giraffe"),
+    new Animal(board, 0, "giraffe"),
   ],
   [
     new Goblin(board, 0, "grunt"),

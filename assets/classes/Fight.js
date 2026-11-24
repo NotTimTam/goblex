@@ -58,13 +58,31 @@ export default class Fight {
     creatures.forEach((creature, i) => {
       const button = document.createElement("button");
       button.className = `creature ${creature.creatureType}`;
+      button.setAttribute("index", i);
+
+      if (creature.creatureType === "animal") {
+        const qs = `div.stats div.healthbars div.hp[index="${i}"]`;
+
+        button.addEventListener("mouseenter", () => {
+          this.interface.querySelector(qs).classList.add("highlight");
+        });
+
+        button.addEventListener("mouseleave", (e) => {
+          if (document.activeElement !== e.currentTarget)
+            this.interface.querySelector(qs).classList.remove("highlight");
+        });
+
+        button.addEventListener("focus", () => {
+          this.interface.querySelector(qs).classList.add("highlight");
+        });
+
+        button.addEventListener("blur", () => {
+          this.interface.querySelector(qs).classList.remove("highlight");
+        });
+      }
 
       const sprite = document.createElement("div");
       sprite.className = "sprite init";
-
-      const hb = healthbar();
-      sprite.appendChild(hb);
-      hb.children[0].style.width = `${100 * (creature.health / creature.maxHealth)}%`;
 
       const url = new URL(
         `assets/images/${creature.creatureType}s/${creature.type}.png`,
@@ -107,12 +125,17 @@ export default class Fight {
 
     this.board.game.appendChild(this.interface);
 
-    // Create gui display
+    // Create gui display.
     this.graphics = document.createElement("div");
     this.graphics.className = "graphics";
     this.interface.appendChild(this.graphics);
 
-    // Create battlefield containers
+    // Create stats display
+    this.stats = document.createElement("div");
+    this.stats.className = "stats";
+    this.interface.appendChild(this.stats);
+
+    // Create battlefield containers.
     const animalsDisp = document.createElement("div");
     animalsDisp.className = "creatures animals";
     this.graphics.appendChild(animalsDisp);
@@ -121,11 +144,45 @@ export default class Fight {
     goblinsDisp.className = "creatures goblins";
     this.graphics.appendChild(goblinsDisp);
 
-    // Add creatures to their formations
+    // Add creatures to their formations.
     this.__createFormation(this.animals, animalsDisp, "animals");
     this.__createFormation(this.goblins, goblinsDisp, "goblins");
 
-    // Create stats display
+    // Add to stats display.
+    const healthBars = document.createElement("div");
+    healthBars.className = "healthbars";
+    this.stats.appendChild(healthBars);
+
+    const counts = new Map();
+    const totals = new Map();
+
+    this.animals.forEach(({ type }) => {
+      totals.set(type, (totals.get(type) || 0) + 1);
+    });
+
+    this.animals.forEach((animal, i) => {
+      const index = (counts.get(animal.type) || 0) + 1;
+      counts.set(animal.type, index);
+
+      const hp = document.createElement("div");
+      hp.className = "hp";
+      hp.setAttribute("index", i);
+
+      const name = document.createElement("h3");
+      name.innerHTML = `${animal.type}${totals.get(animal.type) > 1 ? ` (${index})` : ""}`;
+      hp.appendChild(name);
+
+      const txt = document.createElement("p");
+      txt.innerHTML = `${animal.health}HP`;
+      hp.appendChild(txt);
+
+      const hb = healthbar();
+      hb.children[0].style.width = `${100 * (animal.health / animal.maxHealth)}%`;
+
+      hp.appendChild(hb);
+
+      healthBars.appendChild(hp);
+    });
 
     // Create controls interface
     // this.controls = document.createElement("div");
