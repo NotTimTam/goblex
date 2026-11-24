@@ -68,7 +68,10 @@ export default class Fight {
         });
 
         button.addEventListener("mouseleave", (e) => {
-          if (document.activeElement !== e.currentTarget)
+          if (
+            document.activeElement &&
+            document.activeElement !== e.currentTarget
+          )
             this.interface.querySelector(qs).classList.remove("highlight");
         });
 
