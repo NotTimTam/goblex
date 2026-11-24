@@ -282,7 +282,7 @@ export default class Board {
       `Your ${attackingAnimals.map((a) => a.type).join(", ")} ${attackingAnimals.length > 1 ? "are" : "is"} attacking a ${creature.type} goblin!`,
     );
 
-    this.turnData.fight = new Fight(this);
+    this.turnData.fight = new Fight(this, attackingAnimals, [creature]);
 
     this.turnData.fight.start();
 
