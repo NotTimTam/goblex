@@ -335,6 +335,10 @@ div.fight div.graphics div.creatures button.creature {
   transform: var(--default-transform);
 }
 
+div.fight div.graphics div.creatures button.creature div.sprite.hit {
+  animation: shake 0.25s ease-in-out;
+}
+
 div.fight div.graphics div.creatures button.animal {
   cursor: unset;
 }

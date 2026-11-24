@@ -1,4 +1,5 @@
 import { EMOTIONS, healthbar } from "../util/creatures.js";
+import { capitalizeWords } from "../util/display.js";
 
 export default class Fight {
   constructor(board, animals, goblins) {
@@ -12,10 +13,10 @@ export default class Fight {
     this.animals.forEach((animal, i) => {
       let frame = EMOTIONS.normal;
       const sprite = this.graphics.querySelector(
-        `button.goblin[index="${i}"] div.sprite`,
+        `button.animal[index="${i}"] div.sprite`,
       );
 
-      if (animal.DEAD) {
+      if (animal.dead) {
         frame = EMOTIONS.dead;
         sprite.classList.toggle("dead", true);
       } else if (this.animals.length > this.goblins.length) {
@@ -34,7 +35,8 @@ export default class Fight {
 
       this.interface.querySelector(
         `div.stats div.healthbars div.hp[index="${i}"] p`,
-      ).innerHTML = `${Math.max(0, animal.health)}HP`;
+      ).innerHTML =
+        `${Math.round(Math.max(0, animal.health))}/${animal.maxHealth}HP`;
     });
 
     this.goblins.forEach((goblin, i) => {
@@ -61,6 +63,29 @@ export default class Fight {
   }
 
   goblinTurn() {
+    this.goblins
+      .filter((g) => !g.dead)
+      .forEach((goblin) => {
+        const targets = this.animals.filter((a) => !a.dead);
+        const i = Math.floor(Math.random() * targets.length);
+        const target = targets[i];
+
+        target.health -= goblin.attack;
+        this.graphics
+          .querySelector(`button.animal[index="${i}"] div.sprite`)
+          .classList.toggle("hit", true);
+
+        this.board.logs.push(
+          `${capitalizeWords(goblin.type)} attacked ${target.type} for ${goblin.attack}HP`,
+        );
+
+        if (target.health <= 0) {
+          goblin.lastKill = true;
+        }
+
+        this.animateCreatures();
+      });
+
     this.turn = "player";
   }
 
@@ -93,7 +118,9 @@ export default class Fight {
     } else if (t === "player") {
       this.turnData = {};
 
-      this.currentAnimal = 0;
+      this.currentAnimal = this.animals.indexOf(
+        this.animals.find((a) => !a.dead),
+      );
     }
   }
 
@@ -104,7 +131,7 @@ export default class Fight {
   set currentAnimal(n) {
     if (this.turn !== "player") return;
 
-    if (n >= this.animals.length) this.turn = "goblin";
+    if (n >= this.animals.length || n === -1) this.turn = "goblin";
     else {
       this.turnData.currentAnimal = n;
       this.graphics.querySelector(`button.animal[index="${n}"]`)?.focus();
@@ -144,8 +171,23 @@ export default class Fight {
       }
     } else {
       creature.health -= 1;
+      this.graphics
+        .querySelector(
+          `button.goblin[index="${this.goblins.indexOf(creature)}"] div.sprite`,
+        )
+        .classList.toggle("hit", true);
 
-      this.currentAnimal++;
+      const animal = this.animals[this.currentAnimal];
+
+      this.board.logs.push(
+        `${capitalizeWords(animal.type)} attacked ${creature.type} for ${1}HP`,
+      );
+
+      const notDeads = this.animals
+        .slice(this.currentAnimal + 1)
+        .filter((a) => !a.dead);
+
+      this.currentAnimal = this.animals.indexOf(notDeads[0]);
 
       this.animateCreatures();
     }
@@ -212,6 +254,9 @@ export default class Fight {
 
       const sprite = document.createElement("div");
       sprite.className = "sprite init";
+      sprite.addEventListener("animationend", (e) => {
+        if (e.animationName === "shake") sprite.classList.toggle("hit", false);
+      });
 
       const url = new URL(
         `assets/images/${creature.creatureType}s/${creature.type}.png`,
@@ -318,7 +363,7 @@ export default class Fight {
       hp.appendChild(name);
 
       const txt = document.createElement("p");
-      txt.innerHTML = `${animal.health}HP`;
+      txt.innerHTML = `${Math.round(animal.health)}HP`;
       hp.appendChild(txt);
 
       const hb = healthbar();

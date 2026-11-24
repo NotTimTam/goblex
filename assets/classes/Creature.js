@@ -22,7 +22,7 @@ export default class Creature {
       this.element.classList.toggle("hit", true);
     }
 
-    this.__rawHealth = n;
+    this.__rawHealth = Math.min(Math.max(n, 0), this.maxHealth || Infinity);
   }
 
   get maxHealth() {

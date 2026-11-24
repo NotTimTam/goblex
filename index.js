@@ -34,7 +34,7 @@ const fight = new Fight(
   ],
   [
     new Goblin(board, 0, "grunt"),
-    new Goblin(board, 0, "grunt"),
+    new Goblin(board, 0, "assassin"),
     new Goblin(board, 0, "grunt"),
     new Goblin(board, 0, "grunt"),
     (() => {
