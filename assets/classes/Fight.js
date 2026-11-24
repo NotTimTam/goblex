@@ -1,3 +1,5 @@
+import { healthbar } from "../util/creatures.js";
+
 export default class Fight {
   constructor(board, animals, goblins) {
     this.board = board;
@@ -59,6 +61,10 @@ export default class Fight {
 
       const sprite = document.createElement("div");
       sprite.className = "sprite init";
+
+      const hb = healthbar();
+      sprite.appendChild(hb);
+      hb.children[0].style.width = `${100 * (creature.health / creature.maxHealth)}%`;
 
       const url = new URL(
         `assets/images/${creature.creatureType}s/${creature.type}.png`,

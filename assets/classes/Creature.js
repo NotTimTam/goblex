@@ -1,3 +1,5 @@
+import { healthbar } from "../util/creatures.js";
+
 export default class Creature {
   constructor(board, i, creatureType) {
     this.board = board;
@@ -81,17 +83,11 @@ export default class Creature {
     return (
       this.element.querySelector("div.healthbar") ||
       (() => {
-        const healthbar = document.createElement("div");
-        healthbar.className = "healthbar";
+        const hb = healthbar();
 
-        const inner = document.createElement("span");
-        inner.className = "inner";
+        this.element.appendChild(hb);
 
-        healthbar.appendChild(inner);
-
-        this.element.appendChild(healthbar);
-
-        return healthbar;
+        return hb;
       })()
     );
   }

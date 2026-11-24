@@ -26,7 +26,13 @@ const fight = new Fight(
     new Goblin(board, 0, "grunt"),
     new Goblin(board, 0, "grunt"),
     new Goblin(board, 0, "grunt"),
-    new Goblin(board, 0, "grunt"),
+    (() => {
+      const gob = new Goblin(board, 0, "grunt");
+
+      gob.health = gob.health / 2;
+
+      return gob;
+    })(),
     new Goblin(board, 0, "grunt"),
   ],
 );

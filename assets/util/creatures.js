@@ -56,3 +56,15 @@ export const goblins = {
   vampire: { health: 100, attack: 30 },
   demon: { health: 200, attack: 50 },
 };
+
+export const healthbar = () => {
+  const healthbar = document.createElement("div");
+  healthbar.className = "healthbar";
+
+  const inner = document.createElement("span");
+  inner.className = "inner";
+
+  healthbar.appendChild(inner);
+
+  return healthbar;
+};

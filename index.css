@@ -149,29 +149,6 @@ div.board[turn="player"] button.tile.attackable:hover:not(.dead) {
   box-shadow: 0px 0px 20px tomato;
 }
 
-div.board button.tile div.healthbar {
-  position: absolute;
-
-  bottom: -8px;
-  left: 0;
-
-  width: 100%;
-  height: 4px;
-
-  background-color: #ffffff2c;
-}
-
-div.board button.tile div.healthbar span.inner {
-  height: 100%;
-  width: 100%;
-
-  display: block;
-
-  transition: width 0.33333s ease-in-out;
-
-  background-color: tomato;
-}
-
 div.board button.tile.hit {
   animation: shake 0.25s ease-in-out;
 }
@@ -429,5 +406,68 @@ div.fight div.graphics div.creatures button.creature div.sprite.init {
 
   100% {
     transform: translateY(0px);
+  }
+}
+
+/* Healthbar */
+div.healthbar {
+  position: absolute;
+
+  bottom: -8px;
+  left: 0;
+
+  width: 100%;
+  height: 4px;
+
+  background-color: #ffffff2c;
+}
+
+div.healthbar span.inner {
+  height: 100%;
+  width: 100%;
+
+  display: block;
+
+  transition: width 0.33333s ease-in-out;
+
+  background-color: tomato;
+}
+
+div.fight div.graphics div.creatures button.creature div.sprite div.healthbar {
+  top: -12px;
+  bottom: unset;
+
+  height: 6px;
+
+  background-color: #343434cc;
+  border: 0.5px solid #fff;
+
+  transform: rotateZ(180deg);
+
+  transition: opacity 0.25s ease-in-out;
+}
+
+div.fight
+  div.graphics
+  div.creatures
+  button.creature
+  div.sprite.init
+  div.healthbar {
+  animation: healthbar-init 1s ease calc(var(--delay));
+}
+
+@keyframes healthbar-init {
+  0% {
+    transform: rotateZ(180deg) scale(0%);
+    top: -100px;
+  }
+
+  75% {
+    transform: rotateZ(180deg) scale(200%);
+  }
+
+  100% {
+    transform: rotateZ(180deg) scale(100%);
+    top: -12px;
   }
 }
