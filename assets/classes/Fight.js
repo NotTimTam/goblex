@@ -1,4 +1,4 @@
-import { healthbar } from "../util/creatures.js";
+import { EMOTIONS, healthbar } from "../util/creatures.js";
 
 export default class Fight {
   constructor(board, animals, goblins) {
@@ -6,6 +6,149 @@ export default class Fight {
 
     this.animals = animals;
     this.goblins = goblins;
+  }
+
+  animateCreatures() {
+    this.animals.forEach((animal, i) => {
+      let frame = EMOTIONS.normal;
+      const sprite = this.graphics.querySelector(
+        `button.goblin[index="${i}"] div.sprite`,
+      );
+
+      if (animal.DEAD) {
+        frame = EMOTIONS.dead;
+        sprite.classList.toggle("dead", true);
+      } else if (this.animals.length > this.goblins.length) {
+        frame = EMOTIONS.happy;
+      } else if (this.animals.length < this.goblins.length) {
+        frame = EMOTIONS.scared;
+      }
+
+      this.graphics
+        .querySelector(`button.animal[index="${i}"] div.sprite`)
+        .style.setProperty("--frame", frame);
+
+      this.interface.querySelector(
+        `div.stats div.healthbars div.hp[index="${i}"] div.healthbar span.inner`,
+      ).style.width = `${100 * (animal.health / animal.maxHealth)}%`;
+
+      this.interface.querySelector(
+        `div.stats div.healthbars div.hp[index="${i}"] p`,
+      ).innerHTML = `${Math.max(0, animal.health)}HP`;
+    });
+
+    this.goblins.forEach((goblin, i) => {
+      let frame = EMOTIONS.scheming;
+      const sprite = this.graphics.querySelector(
+        `button.goblin[index="${i}"] div.sprite`,
+      );
+
+      if (goblin.dead) {
+        frame = EMOTIONS.dead;
+        sprite.classList.toggle("dead", true);
+      } else if (this.goblins.length > this.animals.length) {
+        frame = EMOTIONS.scheming;
+      } else if (this.goblins.length < this.animals.length) {
+        frame = EMOTIONS.scared;
+      }
+
+      sprite.style.setProperty("--frame", frame);
+
+      this.graphics.querySelector(
+        `button.goblin[index="${i}"] div.sprite div.healthbar span.inner`,
+      ).style.width = `${100 * (goblin.health / goblin.maxHealth)}%`;
+    });
+  }
+
+  goblinTurn() {
+    this.turn = "player";
+  }
+
+  set turn(t) {
+    this.__lastClick = null;
+    this.__rawTurn = t;
+    document.activeElement.blur();
+
+    this.board.animateCreatures();
+    this.animateCreatures();
+
+    // Before triggering turn, test if game is in a win or loss state.
+    const end = this.endCondition;
+    if (end) {
+      console.warn("handle end condition");
+      return;
+    }
+
+    // For styling purposes, indicate the turn to the board.
+    this.interface.setAttribute("turn", this.__rawTurn);
+    this.board.logs.push(`${t === "player" ? "Your" : "Gobby"} move...`);
+
+    if (t === "goblin") {
+      if (this.board.delayGoblinTurn)
+        this.board.logs.push(`The goblin(s) are considering their options...`);
+      setTimeout(
+        () => this.goblinTurn(),
+        this.board.delayGoblinTurn ? Math.random() * 1000 + 200 : 0,
+      );
+    } else if (t === "player") {
+      this.turnData = {};
+
+      this.currentAnimal = 0;
+    }
+  }
+
+  get turn() {
+    return this.__rawTurn || "player";
+  }
+
+  set currentAnimal(n) {
+    if (this.turn !== "player") return;
+
+    if (n >= this.animals.length) this.turn = "goblin";
+    else {
+      this.turnData.currentAnimal = n;
+      this.graphics.querySelector(`button.animal[index="${n}"]`)?.focus();
+    }
+  }
+
+  get currentAnimal() {
+    return this.turnData?.currentAnimal;
+  }
+
+  get endCondition() {
+    /*
+    WIN CONDITIONS:
+    - All goblins are dead.
+    */
+    if (!this.goblins.find((a) => !a.dead)) return "win";
+
+    /*
+    LOSS CONDITIONS:
+    - All animals are dead.
+    */
+    if (!this.animals.find((a) => !a.dead)) return "loss";
+
+    return false;
+  }
+
+  onclick(creature) {
+    if (this.turn !== "player") return;
+
+    if (creature.creatureType === "animal") {
+      const index = this.animals.indexOf(creature);
+
+      if (index !== this.currentAnimal) {
+        this.graphics
+          .querySelector(`button.animal[index="${this.currentAnimal}"]`)
+          .focus();
+      }
+    } else {
+      creature.health -= 1;
+
+      this.currentAnimal++;
+
+      this.animateCreatures();
+    }
   }
 
   __createFormation(creatures, container, side) {
@@ -60,29 +203,12 @@ export default class Fight {
       button.className = `creature ${creature.creatureType}`;
       button.setAttribute("index", i);
 
-      if (creature.creatureType === "animal") {
-        const qs = `div.stats div.healthbars div.hp[index="${i}"]`;
-
-        button.addEventListener("mouseenter", () => {
-          this.interface.querySelector(qs).classList.add("highlight");
-        });
-
-        button.addEventListener("mouseleave", (e) => {
-          if (
-            document.activeElement &&
-            document.activeElement !== e.currentTarget
-          )
-            this.interface.querySelector(qs).classList.remove("highlight");
-        });
-
-        button.addEventListener("focus", () => {
-          this.interface.querySelector(qs).classList.add("highlight");
-        });
-
-        button.addEventListener("blur", () => {
-          this.interface.querySelector(qs).classList.remove("highlight");
-        });
-      }
+      button.onclick = () => this.onclick(creature);
+      button.onblur = () => {
+        if (this.turn === "player" && i === this.currentAnimal) {
+          button.focus();
+        }
+      };
 
       const sprite = document.createElement("div");
       sprite.className = "sprite init";
@@ -117,6 +243,22 @@ export default class Fight {
       button.style.zIndex = Math.round(y + 1000);
 
       button.appendChild(sprite);
+
+      if (creature.creatureType === "animal") {
+        const qs = `div.stats div.healthbars div.hp[index="${i}"]`;
+
+        button.addEventListener("focus", () => {
+          this.interface.querySelector(qs).classList.add("highlight");
+        });
+
+        button.addEventListener("blur", () => {
+          this.interface.querySelector(qs).classList.remove("highlight");
+        });
+      } else {
+        const hb = healthbar();
+        hb.children[0].style.width = `${100 * (creature.health / creature.maxHealth)}%`;
+        sprite.appendChild(hb);
+      }
 
       container.appendChild(button);
     });
@@ -219,5 +361,7 @@ export default class Fight {
     // });
 
     // this.interface.appendChild(this.controls);
+
+    this.turn = "player";
   }
 }

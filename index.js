@@ -23,7 +23,13 @@ const fight = new Fight(
     new Animal(board, 0, "giraffe"),
     new Animal(board, 0, "giraffe"),
     new Animal(board, 0, "giraffe"),
-    new Animal(board, 0, "giraffe"),
+    (() => {
+      const gob = new Animal(board, 0, "giraffe");
+
+      gob.health = gob.health / 2;
+
+      return gob;
+    })(),
     new Animal(board, 0, "giraffe"),
   ],
   [

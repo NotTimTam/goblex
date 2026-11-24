@@ -296,6 +296,30 @@ div.fight div.graphics div.creatures {
   position: relative;
 }
 
+div.fight[turn="player"] div.graphics div.creatures.animals::before {
+  content: "v";
+
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+
+  font-weight: 800;
+  color: orange;
+}
+
+div.fight[turn="goblin"] div.graphics div.creatures.goblins::before {
+  content: "v";
+
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+
+  font-weight: 800;
+  color: orange;
+}
+
 div.fight div.graphics div.creatures button.creature {
   position: absolute;
   left: 50%;
@@ -311,6 +335,10 @@ div.fight div.graphics div.creatures button.creature {
   transform: var(--default-transform);
 }
 
+div.fight div.graphics div.creatures button.animal {
+  cursor: unset;
+}
+
 div.fight div.graphics div.creatures button.creature div.sprite {
   width: 100%;
   height: 100%;
@@ -321,7 +349,9 @@ div.fight div.graphics div.creatures button.creature div.sprite {
   border: 1px solid #fff;
   box-shadow: 0px 0px 10px #000000ab;
 
-  transition: all 0.1s ease-in-out;
+  transition: 0.1s ease-in-out;
+  transition-property:
+    transform, box-shadow, border-width, background-color, opacity;
 
   animation-delay: var(--delay);
 
@@ -333,6 +363,15 @@ div.fight div.graphics div.creatures button.creature div.sprite {
     color-mix(in srgb, var(--box-shadow) 33.333%, transparent);
 }
 
+div.fight div.graphics div.creatures button.creature:has(div.sprite.dead) {
+  pointer-events: none;
+  cursor: default;
+}
+
+div.fight div.graphics div.creatures button.creature div.sprite.dead {
+  opacity: 0.5;
+}
+
 div.fight div.graphics div.creatures button.animal div.sprite {
   background-size: 400% 100%;
   background-position: calc(var(--frame, 0) / 3 * 100%) 0;
@@ -340,18 +379,15 @@ div.fight div.graphics div.creatures button.animal div.sprite {
   --movement: 1.5px;
 }
 
-div.fight div.graphics div.creatures button.animal:hover div.sprite {
-  translate: 0 -10px;
-
-  --accent: dodgerblue;
-
-  --box-shadow: var(--accent);
-}
-
-div.fight div.graphics div.creatures button.animal:focus div.sprite {
+div.fight[turn="player"]
+  div.graphics
+  div.creatures
+  button.animal:focus
+  div.sprite {
   translate: 0 -10px;
   scale: 1.1;
   --accent: orange;
+  box-shadow: 0px 0px 10px orange;
 }
 
 @keyframes bob-animal {
@@ -448,14 +484,6 @@ div.fight div.stats div.healthbars div.hp.highlight h3 {
   color: orange;
 }
 
-div.fight
-  div.stats
-  div.healthbars:has(div.hp.highlight)
-  div.hp:not(.highlight)
-  h3 {
-  opacity: 0.75;
-}
-
 div.fight div.stats div.healthbars div.hp p {
   grid-column: 1 / 2;
   grid-row: 2 / 3;
@@ -495,4 +523,24 @@ div.healthbar span.inner {
   transition: width 0.33333s ease-in-out;
 
   background-color: tomato;
+}
+
+div.fight div.graphics div.creatures button.goblin div.sprite div.healthbar {
+  transform: rotateZ(180deg);
+  top: -12px;
+  bottom: unset;
+
+  height: 6px;
+
+  background-color: #3c3c3ccf;
+  border: 0.5px solid #fff;
+}
+
+div.fight
+  div.graphics
+  div.creatures
+  button.goblin
+  div.sprite.dead
+  div.healthbar {
+  display: none;
 }
