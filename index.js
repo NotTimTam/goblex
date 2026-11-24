@@ -14,37 +14,37 @@ const board = new Board({
   level: levels.base[1],
 });
 
-const fight = new Fight(
-  board,
-  [
-    new Animal(board, 0, "duck"),
-    new Animal(board, 0, "penguin"),
-    new Animal(board, 0, "giraffe"),
-    new Animal(board, 0, "giraffe"),
-    new Animal(board, 0, "giraffe"),
-    new Animal(board, 0, "giraffe"),
-    (() => {
-      const gob = new Animal(board, 0, "giraffe");
+// const fight = new Fight(
+//   board,
+//   [
+//     new Animal(board, 0, "duck"),
+//     new Animal(board, 0, "penguin"),
+//     new Animal(board, 0, "giraffe"),
+//     new Animal(board, 0, "giraffe"),
+//     new Animal(board, 0, "giraffe"),
+//     new Animal(board, 0, "giraffe"),
+//     (() => {
+//       const gob = new Animal(board, 0, "giraffe");
 
-      gob.health = gob.health / 2;
+//       gob.health = gob.health / 2;
 
-      return gob;
-    })(),
-    new Animal(board, 0, "giraffe"),
-  ],
-  [
-    new Goblin(board, 0, "grunt"),
-    new Goblin(board, 0, "assassin"),
-    new Goblin(board, 0, "grunt"),
-    new Goblin(board, 0, "grunt"),
-    (() => {
-      const gob = new Goblin(board, 0, "grunt");
+//       return gob;
+//     })(),
+//     new Animal(board, 0, "giraffe"),
+//   ],
+//   [
+//     new Goblin(board, 0, "grunt"),
+//     new Goblin(board, 0, "assassin"),
+//     new Goblin(board, 0, "grunt"),
+//     new Goblin(board, 0, "grunt"),
+//     (() => {
+//       const gob = new Goblin(board, 0, "grunt");
 
-      gob.health = gob.health / 2;
+//       gob.health = gob.health / 2;
 
-      return gob;
-    })(),
-    new Goblin(board, 0, "grunt"),
-  ],
-);
-fight.start();
+//       return gob;
+//     })(),
+//     new Goblin(board, 0, "grunt"),
+//   ],
+// );
+// fight.start();

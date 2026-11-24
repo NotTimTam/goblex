@@ -100,7 +100,7 @@ export default class Fight {
     // Before triggering turn, test if game is in a win or loss state.
     const end = this.endCondition;
     if (end) {
-      console.warn("handle end condition");
+      this.resolveFight(end);
       return;
     }
 
@@ -310,103 +310,79 @@ export default class Fight {
   }
 
   start() {
-    this.interface = document.createElement("div");
-    this.interface.className = "fight";
+    return new Promise((resolve) => {
+      this.resolveFight = resolve;
+      this.interface = document.createElement("div");
+      this.interface.className = "fight";
 
-    this.board.game.appendChild(this.interface);
+      this.board.game.appendChild(this.interface);
 
-    // Create gui display.
-    this.graphics = document.createElement("div");
-    this.graphics.className = "graphics";
-    this.interface.appendChild(this.graphics);
+      // Create gui display.
+      this.graphics = document.createElement("div");
+      this.graphics.className = "graphics";
+      this.interface.appendChild(this.graphics);
 
-    // Create stats display
-    this.stats = document.createElement("div");
-    this.stats.className = "stats";
-    this.interface.appendChild(this.stats);
+      // Create stats display
+      this.stats = document.createElement("div");
+      this.stats.className = "stats";
+      this.interface.appendChild(this.stats);
 
-    // Create battlefield containers.
-    const animalsDisp = document.createElement("div");
-    animalsDisp.className = "creatures animals";
-    this.graphics.appendChild(animalsDisp);
+      // Create battlefield containers.
+      const animalsDisp = document.createElement("div");
+      animalsDisp.className = "creatures animals";
+      this.graphics.appendChild(animalsDisp);
 
-    const goblinsDisp = document.createElement("div");
-    goblinsDisp.className = "creatures goblins";
-    this.graphics.appendChild(goblinsDisp);
+      const goblinsDisp = document.createElement("div");
+      goblinsDisp.className = "creatures goblins";
+      this.graphics.appendChild(goblinsDisp);
 
-    // Add creatures to their formations.
-    this.__createFormation(this.animals, animalsDisp, "animals");
-    this.__createFormation(this.goblins, goblinsDisp, "goblins");
+      // Add creatures to their formations.
+      this.__createFormation(this.animals, animalsDisp, "animals");
+      this.__createFormation(this.goblins, goblinsDisp, "goblins");
 
-    // Add to stats display.
-    const healthBars = document.createElement("div");
-    healthBars.className = "healthbars";
-    this.stats.appendChild(healthBars);
+      // Add to stats display.
+      const healthBars = document.createElement("div");
+      healthBars.className = "healthbars";
+      this.stats.appendChild(healthBars);
 
-    const counts = new Map();
-    const totals = new Map();
+      const counts = new Map();
+      const totals = new Map();
 
-    this.animals.forEach(({ type }) => {
-      totals.set(type, (totals.get(type) || 0) + 1);
+      this.animals.forEach(({ type }) => {
+        totals.set(type, (totals.get(type) || 0) + 1);
+      });
+
+      this.animals.forEach((animal, i) => {
+        const index = (counts.get(animal.type) || 0) + 1;
+        counts.set(animal.type, index);
+
+        const hp = document.createElement("div");
+        hp.className = "hp";
+        hp.setAttribute("index", i);
+
+        const name = document.createElement("h3");
+        name.innerHTML = `${animal.type}${totals.get(animal.type) > 1 ? ` (${index})` : ""}`;
+        hp.appendChild(name);
+
+        const txt = document.createElement("p");
+        txt.innerHTML = `${Math.round(animal.health)}HP`;
+        hp.appendChild(txt);
+
+        const hb = healthbar();
+        hb.children[0].style.width = `${100 * (animal.health / animal.maxHealth)}%`;
+
+        hp.appendChild(hb);
+
+        healthBars.appendChild(hp);
+      });
+
+      this.turn = "player";
     });
+  }
 
-    this.animals.forEach((animal, i) => {
-      const index = (counts.get(animal.type) || 0) + 1;
-      counts.set(animal.type, index);
+  cleanup() {
+    this.interface.remove();
 
-      const hp = document.createElement("div");
-      hp.className = "hp";
-      hp.setAttribute("index", i);
-
-      const name = document.createElement("h3");
-      name.innerHTML = `${animal.type}${totals.get(animal.type) > 1 ? ` (${index})` : ""}`;
-      hp.appendChild(name);
-
-      const txt = document.createElement("p");
-      txt.innerHTML = `${Math.round(animal.health)}HP`;
-      hp.appendChild(txt);
-
-      const hb = healthbar();
-      hb.children[0].style.width = `${100 * (animal.health / animal.maxHealth)}%`;
-
-      hp.appendChild(hb);
-
-      healthBars.appendChild(hp);
-    });
-
-    // Create controls interface
-    // this.controls = document.createElement("div");
-    // this.controls.className = "controls";
-
-    // const buttons = [
-    //   //   {
-    //   //     label: "item",
-    //   //     action: () => {},
-    //   //   },
-
-    //   {
-    //     label: "special",
-    //     action: () => {},
-    //   },
-
-    //   {
-    //     label: "attack",
-    //     action: () => {},
-    //   },
-    // ];
-
-    // buttons.forEach((b) => {
-    //   const button = document.createElement("button");
-    //   button.onclick = b.action;
-    //   button.innerHTML = b.label;
-
-    //   button.className = "control";
-
-    //   this.controls.appendChild(button);
-    // });
-
-    // this.interface.appendChild(this.controls);
-
-    this.turn = "player";
+    this.board.turnData.fight = null;
   }
 }

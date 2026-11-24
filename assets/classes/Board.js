@@ -271,7 +271,7 @@ export default class Board {
     return this.animals.some((animal) => this.canAnimalAttack(animal));
   }
 
-  triggerAttack(creature) {
+  async triggerAttack(creature) {
     const attackingAnimals = creature.neighbors.filter(
       (a) => a.creatureType === "animal" && !a.dead,
     );
@@ -284,11 +284,14 @@ export default class Board {
 
     this.turnData.fight = new Fight(this, attackingAnimals, [creature]);
 
-    this.turnData.fight.start();
+    const result = await this.turnData.fight.start();
+    this.logs.push(
+      `You ${result === "win" ? "won" : "lost"} that encounter...`,
+    );
 
-    // creature.health -= 5;
+    this.turnData.fight.cleanup();
 
-    // this.turn = "goblin";
+    this.turn = result === "win" ? "player" : "goblin";
   }
 
   click(i) {
