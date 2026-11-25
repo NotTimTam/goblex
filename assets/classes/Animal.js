@@ -14,6 +14,7 @@ export default class Animal extends Creature {
 
     this.health = config.health;
     this.maxHealth = config.health;
+    this.attack = config.attack;
   }
 
   exit() {

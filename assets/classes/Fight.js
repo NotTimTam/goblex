@@ -21,7 +21,10 @@ export default class Fight {
         sprite.classList.toggle("dead", true);
       } else if (this.animals.length > this.goblins.length) {
         frame = EMOTIONS.happy;
-      } else if (this.animals.length < this.goblins.length) {
+      } else if (
+        this.animals.length < this.goblins.length ||
+        (this.animals.length === 1 && this.goblins.length === 1)
+      ) {
         frame = EMOTIONS.scared;
       }
 
@@ -63,30 +66,41 @@ export default class Fight {
   }
 
   goblinTurn() {
+    let timeout = 0;
+
     this.goblins
       .filter((g) => !g.dead)
-      .forEach((goblin) => {
-        const targets = this.animals.filter((a) => !a.dead);
-        const i = Math.floor(Math.random() * targets.length);
-        const target = targets[i];
+      .forEach((goblin, index, arr) => {
+        const hit = () => {
+          const targets = this.animals.filter((a) => !a.dead);
+          const i = Math.floor(Math.random() * targets.length);
+          const target = targets[i];
 
-        target.health -= goblin.attack;
-        this.graphics
-          .querySelector(`button.animal[index="${i}"] div.sprite`)
-          .classList.toggle("hit", true);
+          target.health -= goblin.attack;
+          this.graphics
+            .querySelector(
+              `button.animal[index="${this.animals.indexOf(target)}"] div.sprite`,
+            )
+            .classList.toggle("hit", true);
 
-        this.board.logs.push(
-          `${capitalizeWords(goblin.type)} attacked ${target.type} for ${goblin.attack}HP`,
-        );
+          this.board.logs.push(
+            `${capitalizeWords(goblin.type)} attacked ${target.type} for ${goblin.attack}HP`,
+          );
 
-        if (target.health <= 0) {
-          goblin.lastKill = true;
-        }
+          if (target.health <= 0) {
+            goblin.lastKill = true;
+          }
 
-        this.animateCreatures();
+          this.animateCreatures();
+
+          if (index === arr.length - 1) this.turn = "player";
+        };
+
+        if (this.board.delayGoblinTurn) {
+          timeout += Math.random() * 100 + 500;
+          setTimeout(hit, timeout);
+        } else hit();
       });
-
-    this.turn = "player";
   }
 
   set turn(t) {
@@ -100,7 +114,11 @@ export default class Fight {
     // Before triggering turn, test if game is in a win or loss state.
     const end = this.endCondition;
     if (end) {
-      this.resolveFight(end);
+      this.interface.addEventListener("animationend", (e) => {
+        if (e.animationName === "fight-end") this.resolveFight(end);
+      });
+      this.interface.classList.toggle("end", true);
+
       return;
     }
 
@@ -170,7 +188,7 @@ export default class Fight {
           .focus();
       }
     } else {
-      creature.health -= 1;
+      creature.health -= this.animals[this.currentAnimal].attack;
       this.graphics
         .querySelector(
           `button.goblin[index="${this.goblins.indexOf(creature)}"] div.sprite`,

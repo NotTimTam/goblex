@@ -7,7 +7,7 @@ export const EMOTIONS = {
 };
 
 export const animals = {
-  mouse: { health: 5 },
+  mouse: { health: 5, attack: 2.5 },
   frog: { health: 8 },
   chicken: { health: 10 },
   duck: { health: 12 },
@@ -37,7 +37,7 @@ export const animals = {
 };
 
 export const goblins = {
-  grunt: { health: 10, attack: 2.5 },
+  grunt: { health: 5, attack: 2.5 },
   mohawk: { health: 15, attack: 4 },
   horned: { health: 15, attack: 5 },
   warrior: { health: 15, attack: 6 },

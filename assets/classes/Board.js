@@ -9,6 +9,7 @@ import {
 import Logs from "./Logs.js";
 import { capitalizeWords } from "../util/display.js";
 import Fight from "./Fight.js";
+import { getRandom, logs } from "../util/dialogue.js";
 
 export default class Board {
   /**
@@ -64,6 +65,8 @@ export default class Board {
   }
 
   set turn(t) {
+    if (t === "goblin" && !this.goblins.find((g) => !g.dead)) t = "player";
+
     this.turns++;
 
     this.__lastClick = null;
@@ -154,9 +157,11 @@ export default class Board {
     or
     - All goblins are dead.
     */
-    if (!this.animals.length || !this.goblins.length) return "win";
+    if (!this.animals.length) return "win";
 
     if (this.escapes && !this.animals.find((a) => !a.dead)) return "win";
+
+    if (!this.goblins.find((g) => !g.dead)) return "win";
 
     /*
     LOSS CONDITIONS:
@@ -240,7 +245,7 @@ export default class Board {
     }
 
     if (!possibleMoves.length) {
-      this.logs.push("Gobbies thought really hard but couldn't do sh*t...");
+      this.logs.push(getRandom(logs.goblin.noMove));
       this.turn = "player";
     } else {
       const move = possibleMoves.sort((a, b) => b.value - a.value)[0];

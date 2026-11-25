@@ -11,7 +11,7 @@ const noise = createNoise2D(alea(Date.now()));
 const board = new Board({
   noise,
   // delayGoblinTurn: false,
-  level: levels.base[1],
+  level: levels.base[0],
 });
 
 // const fight = new Fight(
@@ -19,18 +19,10 @@ const board = new Board({
 //   [
 //     new Animal(board, 0, "duck"),
 //     new Animal(board, 0, "penguin"),
+//     new Animal(board, 0, "cow"),
 //     new Animal(board, 0, "giraffe"),
-//     new Animal(board, 0, "giraffe"),
-//     new Animal(board, 0, "giraffe"),
-//     new Animal(board, 0, "giraffe"),
-//     (() => {
-//       const gob = new Animal(board, 0, "giraffe");
-
-//       gob.health = gob.health / 2;
-
-//       return gob;
-//     })(),
-//     new Animal(board, 0, "giraffe"),
+//     new Animal(board, 0, "frog"),
+//     new Animal(board, 0, "dog"),
 //   ],
 //   [
 //     new Goblin(board, 0, "grunt"),
