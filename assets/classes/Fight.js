@@ -112,7 +112,7 @@ export default class Fight {
     this.animateCreatures();
 
     // Before triggering turn, test if game is in a win or loss state.
-    const end = this.endCondition;
+    const end = t === "flee" ? "loss" : this.endCondition;
     if (end) {
       this.interface.addEventListener("animationend", (e) => {
         if (e.animationName === "fight-end") this.resolveFight(end);
@@ -393,6 +393,17 @@ export default class Fight {
 
         healthBars.appendChild(hp);
       });
+
+      // Flee button
+      const flee = document.createElement("button");
+      flee.className = "flee";
+      flee.innerHTML = "flee";
+      flee.onclick = () => {
+        this.board.logs.push("We are getting tf out of here...");
+        this.turn = "flee";
+      };
+
+      this.interface.appendChild(flee);
 
       this.turn = "player";
     });
