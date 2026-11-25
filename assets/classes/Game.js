@@ -68,10 +68,13 @@ export default class Game {
     for (const i in slots) {
       const slot = slots[i];
 
-      const slotDisplay = document.createElement("button");
+      const slotDisplay = document.createElement("div");
       slotDisplay.className = "slot";
-      slotDisplay.innerHTML = `<h2>Slot ${+i + 1}</h2><p>${slot ? (slot.playTime < 1000 * 60 * 60 ? `<1H` : `${Math.floor(slot.playTime / 1000 / 60 / 60)}H`) + " of playtime" : "(empty)"}</p>`;
-      slotDisplay.onclick = () => {
+
+      const slotButton = document.createElement("button");
+      slotButton.className = "select";
+      slotButton.innerHTML = `<h2>Slot ${+i + 1}</h2><p>${slot ? (slot.playTime < 1000 * 60 * 60 ? `<1H` : `${Math.floor(slot.playTime / 1000 / 60 / 60)}H`) + " of playtime" : "(empty)"}</p>`;
+      slotButton.onclick = () => {
         this.currentSlot = +i;
         this.save = slot;
         if (!slot) {
@@ -87,6 +90,26 @@ export default class Game {
           this.screen = { name: "level", level: base[0] };
         }
       };
+
+      slotDisplay.appendChild(slotButton);
+
+      if (slot) {
+        const slotClear = document.createElement("button");
+        slotClear.className = "clear default";
+        slotClear.innerHTML = "erase";
+        slotClear.onclick = (e) => {
+          e.stopPropagation();
+          const conf = confirm(
+            "Are you sure you want to erase this slot. This action is irreversable!",
+          );
+
+          if (conf) {
+            localStorage.removeItem(`goblex_slot_${+i + 1}`);
+            this.screen = "saves";
+          }
+        };
+        slotDisplay.appendChild(slotClear);
+      }
 
       slotsDisplay.appendChild(slotDisplay);
     }
