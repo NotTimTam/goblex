@@ -333,7 +333,7 @@ export default class Fight {
       this.interface = document.createElement("div");
       this.interface.className = "fight";
 
-      this.board.game.appendChild(this.interface);
+      this.board.gameElement.appendChild(this.interface);
 
       // Create gui display.
       this.graphics = document.createElement("div");

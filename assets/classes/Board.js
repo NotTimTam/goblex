@@ -1,13 +1,7 @@
-import { EMOTIONS } from "../util/creatures.js";
-
 import Animal from "./Animal.js";
 import Goblin from "./Goblin.js";
-import {
-  animals as animalTypes,
-  goblins as goblinTypes,
-} from "../util/creatures.js";
+import { animals as animalTypes } from "../util/creatures.js";
 import Logs from "./Logs.js";
-import { capitalizeWords } from "../util/display.js";
 import Fight from "./Fight.js";
 import { getRandom, logs } from "../util/dialogue.js";
 
@@ -19,12 +13,16 @@ export default class Board {
    * @param {number} config.level.width
    * @param {boolean} config.delayGoblinTurn
    */
-  constructor(config) {
+  constructor(game, config) {
     const {
+      level,
       level: { width, tiles },
 
       delayGoblinTurn = true,
     } = config;
+
+    this.game = game;
+    this.__levelSource = level;
 
     this.delayGoblinTurn = delayGoblinTurn;
 
@@ -34,9 +32,9 @@ export default class Board {
         : tiles;
     this.size = this.level.length;
 
-    this.game = document.querySelector("main.game");
-    this.turnDisplay = this.game.querySelector("p.turn-display");
-    this.board = this.game.querySelector("div.board");
+    this.gameElement = document.querySelector("main.game");
+    this.turnDisplay = this.gameElement.querySelector("p.turn-display");
+    this.board = this.gameElement.querySelector("div.board");
     this.boardWidth = width;
 
     this.turns = 0;
@@ -59,7 +57,7 @@ export default class Board {
   }
 
   get endTurnButton() {
-    return this.game.querySelector("button#end-turn");
+    return this.gameElement.querySelector("button#end-turn");
   }
 
   set turn(t) {
@@ -102,11 +100,11 @@ export default class Board {
         button.id = "retry";
         button.innerHTML = "RETRY";
         button.onclick = () => {
-          alert("NOT IMPLEMENTED");
+          this.game.loadLevel(this.__levelSource);
         };
       }
 
-      this.game.appendChild(button);
+      this.gameElement.appendChild(button);
     } else {
       this.logs.push(`${t === "player" ? "Your" : "Gobby"} turn...`);
       this.turnDisplay.innerHTML =
@@ -129,7 +127,7 @@ export default class Board {
           if (this.turn === "player") this.turn = "goblin";
         };
 
-        this.game.appendChild(button);
+        this.gameElement.appendChild(button);
       }
     }
   }

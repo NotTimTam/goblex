@@ -56,7 +56,7 @@ export default class Game {
     </main>
     <footer class="logs"></footer>`;
 
-    this.board = new Board({
+    this.board = new Board(this, {
       // delayGoblinTurn: false,
       level,
     });
