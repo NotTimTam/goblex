@@ -1,10 +1,14 @@
-import Board from "./assets/classes/Board.js";
-import { levels } from "./assets/util/levels.js";
+import Game from "./assets/classes/Game.js";
 
-const board = new Board({
-  // delayGoblinTurn: false,
-  level: levels.base[0],
-});
+console.log(
+  "%c*chud voice* I'm in",
+  "background: black; color: green; font-size: x-large",
+);
+console.log(
+  `I don't know what you're looking for here... But if its for a way to cheat, let me know because I haven't figured out how to yet either...\n\nIf someone told you to paste something here, its probably a scam... But idgaf. Live boldy.`,
+);
+
+new Game();
 
 // const fight = new Fight(
 //   board,

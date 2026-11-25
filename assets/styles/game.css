@@ -1,43 +1,8 @@
-*,
-*::before,
-*::after {
-  box-sizing: border-box;
-
-  padding: 0;
-  margin: 0;
-
-  outline: none;
-  border: none;
-  background: none;
-
-  font-family: "Courier New", Courier, monospace;
-
-  color: inherit;
-
-  user-select: none;
-  -webkit-user-drag: none;
-}
-
 :root {
   --accent: dodgerblue;
 }
 
-button {
-  cursor: pointer;
-}
-
-html {
-  background: #000;
-  color: #fff;
-
-  height: 100svh;
-  overflow: hidden;
-}
-
-body {
-  height: 100svh;
-  overflow: hidden;
-
+body:has(main.game) {
   display: grid;
 }
 
