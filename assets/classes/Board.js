@@ -17,19 +17,17 @@ export default class Board {
    * @param {*} config.level
    * @param {Array<number>} config.level.tiles
    * @param {number} config.level.width
-   * @param {NoiseFunction2D} config.noise
    * @param {boolean} config.delayGoblinTurn
    */
   constructor(config) {
     const {
       level: { width, tiles },
-      noise,
+
       delayGoblinTurn = true,
     } = config;
 
     this.delayGoblinTurn = delayGoblinTurn;
 
-    this.noise = noise;
     this.level =
       typeof tiles === "string"
         ? tiles.split(",").map((c) => (!isNaN(+c) ? +c : c))
@@ -407,7 +405,7 @@ export default class Board {
   }
 
   buildBoard() {
-    const { level, size, noise } = this;
+    const { level, size } = this;
 
     // Create elements.
     this.board.style.gridTemplateColumns = "1fr "
