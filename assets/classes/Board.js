@@ -88,7 +88,7 @@ export default class Board {
       this.turnDisplay.innerHTML = end === "win" ? "YOU WIN!" : "YOU LOSE :(";
 
       const button = document.createElement("button");
-      button.className = "game-trigger";
+      button.className = "game-trigger default";
 
       if (end === "win") {
         button.id = "next-level";
@@ -120,7 +120,7 @@ export default class Board {
       } else if (t === "player") {
         // Setup player turn.
         const button = document.createElement("button");
-        button.className = "game-trigger";
+        button.className = "game-trigger default";
         button.id = "end-turn";
         button.innerHTML = "END TURN";
         button.onclick = () => {

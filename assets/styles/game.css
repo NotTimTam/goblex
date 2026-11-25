@@ -516,28 +516,13 @@ div.fight
 
 /* Buttons */
 button.game-trigger {
-  border: 1px solid #fff;
-  padding: 0.25rem 0.5rem;
-  font-size: 1rem;
-
   position: absolute;
   top: calc(100% + 1rem);
   left: 50%;
   transform: translateX(-50%);
 }
 
-button.game-trigger:hover:not(:active),
-button.flee:hover:not(:active) {
-  background-color: #fff;
-  color: #000;
-}
-
 button.flee {
-  border: 1px solid #fff;
-  padding: 0.25rem 0.5rem;
-  font-size: 1rem;
-  text-transform: uppercase;
-
   position: absolute;
   top: 0;
   right: 0;

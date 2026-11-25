@@ -396,7 +396,7 @@ export default class Fight {
 
       // Flee button
       const flee = document.createElement("button");
-      flee.className = "flee";
+      flee.className = "flee default";
       flee.innerHTML = "flee";
       flee.onclick = () => {
         this.board.logs.push("We are getting tf out of here...");
