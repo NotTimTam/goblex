@@ -54,6 +54,6 @@ button:disabled {
   pointer-events: none;
 }
 
-button:focus {
+button:not(:has(div.sprite)):focus {
   outline: 2px solid dodgerblue;
 }
