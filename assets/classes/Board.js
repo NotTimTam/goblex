@@ -114,6 +114,10 @@ export default class Board {
       button.className = "game-trigger default";
 
       if (end === "win") {
+        // Record to save that this level is complete.
+        this.game.completeLevel(0);
+
+        // Create next-level button.
         button.id = "next-level";
         button.innerHTML = "NEXT LEVEL";
         button.onclick = () => {

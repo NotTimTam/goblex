@@ -23,6 +23,8 @@ export default class Game {
         playTime: this.save.playTime + performance.now(),
       }),
     );
+
+    if (this.board) this.board.logs.push("Progress saved!");
   }
 
   get screen() {
@@ -40,6 +42,9 @@ export default class Game {
         return;
       case "menu":
         this.loadMenu();
+        break;
+      case "levels":
+        this.loadLevels(rest || {});
         break;
       case "level":
         this.loadLevel(...rest.level);
@@ -114,7 +119,7 @@ export default class Game {
             this.save = {
               playTime: 0,
               level: ["base", 0],
-              levels: [],
+              levels: {},
               points: 0,
             };
 
@@ -126,7 +131,16 @@ export default class Game {
           } else {
             this.save = slot;
 
-            this.screen = { name: "level", level: this.save.level };
+            const [currentPack, currentLevel] = this.save.level;
+
+            // If the player's current level was won on their last save, we go to the level selector.
+            if (
+              this.save.levels[currentPack] &&
+              this.save.levels[currentPack][currentLevel]?.w
+            )
+              this.screen = { name: "levels", from: "saves" };
+            // Otherwise, we go to that level.
+            else this.screen = { name: "level", level: this.save.level };
           }
         };
 
@@ -213,8 +227,112 @@ export default class Game {
 
     this.board = new Board(this, {
       // delayGoblinTurn: false,
-      level: packs[pack][level],
+      level: packs[pack].data[level],
     });
+  }
+
+  loadLevels({ from }) {
+    if (!this.save) return;
+
+    if (this.board) this.board.cleanup();
+
+    document.body.innerHTML = `<main class="packs"><h1>Select level pack</h1></main>`;
+
+    // Build packs view
+    const packsList = document.createElement("div");
+    packsList.className = "packs-list";
+
+    const loadPackView = (pack, packData) => {
+      const packSave = this.save.levels[pack];
+
+      document.body.innerHTML = `<main class="levels"><h1>Select level</h1></main>`;
+
+      const levelList = document.createElement("div");
+      levelList.className = "levels-list";
+
+      for (const [i, level] of Object.entries(packData.data)) {
+        const levelButton = document.createElement("button");
+
+        const levelUnlocked =
+          +i === 0 || (packSave[+i - 1] && packSave[+i - 1].w);
+        const levelCompleted = packSave && packSave[+i]?.w;
+
+        levelButton.className = "level default";
+        levelButton.innerHTML = i;
+
+        if (levelCompleted) levelButton.classList.toggle("completed", true);
+
+        if (levelUnlocked)
+          levelButton.onclick = () =>
+            (this.screen = { name: "level", level: [pack, +i] });
+        else levelButton.disabled = true;
+
+        levelList.appendChild(levelButton);
+      }
+
+      document.body.children[0].appendChild(levelList);
+
+      // Build back button
+      const back = document.createElement("button");
+      back.innerHTML = "back";
+      back.onclick = () => (this.screen = { name: "levels", from });
+      back.className = "default back";
+      document.body.children[0].appendChild(back);
+    };
+
+    Object.entries({
+      ...packs,
+      extreme: { data: {} },
+      dungeon: { data: {} },
+      eggplant: { data: {} },
+      bodycam: { data: {} },
+      greg: { data: {} },
+      egg: { data: {} },
+      leg: { data: {} },
+      fuckyou: { data: {} },
+      eatmy: { data: {} },
+      peenar: { data: {} },
+      please: { data: {} },
+      bro: { data: {} },
+    })
+      .filter(([_, d]) => !d.hidden)
+      .forEach(([pack, packData]) => {
+        const packButton = document.createElement("button");
+
+        const numLevels = Object.keys(packData.data).length;
+        const packSave = this.save.levels[pack];
+        const progressInPack = packSave ? Object.keys(packSave).length : 0;
+
+        packButton.className = "pack default";
+
+        packButton.innerHTML = `
+          <h2>${pack}</h2>
+        `;
+
+        if (progressInPack === numLevels && numLevels > 0) {
+          packButton.classList.toggle("completed", true);
+          packButton.innerHTML += `<p>Completed ${numLevels} level${numLevels === 1 ? "" : "s"}!</p>`;
+        } else {
+          packButton.innerHTML += `<p>${progressInPack} / ${numLevels} level${numLevels === 1 ? "" : "s"}</p>`;
+        }
+
+        if (numLevels > 0) {
+          packButton.onclick = () => loadPackView(pack, packData);
+        } else {
+          packButton.disabled = true;
+        }
+
+        packsList.appendChild(packButton);
+      });
+
+    document.body.children[0].appendChild(packsList);
+
+    // Build back button
+    const back = document.createElement("button");
+    back.innerHTML = "back";
+    back.onclick = () => (this.screen = from ?? "menu");
+    back.className = "default back";
+    document.body.children[0].appendChild(back);
   }
 
   nextLevel() {
@@ -222,7 +340,7 @@ export default class Game {
 
     const [currentPack, currentLevel] = this.save.level;
 
-    const nextLevel = packs[currentPack][currentLevel + 1];
+    const nextLevel = packs[currentPack].data[currentLevel + 1];
 
     if (nextLevel) this.loadLevel(currentPack, currentLevel + 1);
     else {
@@ -239,5 +357,23 @@ export default class Game {
     const [currentPack, currentLevel] = this.save.level;
 
     this.loadLevel(currentPack, currentLevel);
+  }
+
+  completeLevel(points) {
+    if (!this.save) return;
+
+    const [currentPack, currentLevel] = this.save.level;
+
+    const levelAlreadyWon =
+      this.save.levels[currentPack] &&
+      this.save.levels[currentPack][currentLevel] &&
+      this.save.levels[currentPack][currentLevel].w;
+
+    if (!this.save.levels[currentPack]) this.save.levels[currentPack] = {};
+
+    this.save.levels[currentPack][currentLevel] = { w: true, pts: points };
+    if (!levelAlreadyWon) this.save.points += points;
+
+    this.saveGame();
   }
 }

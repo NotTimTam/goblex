@@ -48,3 +48,8 @@ button.default:hover:not(:active) {
   background-color: #fff;
   color: #000;
 }
+
+button:disabled {
+  opacity: 0.5;
+  pointer-events: none;
+}

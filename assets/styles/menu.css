@@ -161,11 +161,6 @@ main.screen button:hover:not(:active) {
   color: #000;
 }
 
-main.screen button:disabled {
-  opacity: 0.5;
-  pointer-events: none;
-}
-
 /* Error screen */
 main.error,
 main.loading {
@@ -259,4 +254,91 @@ main.saves button.back {
   margin: 1rem auto;
 
   padding-inline: 2rem;
+}
+
+/* Packs view */
+main.packs {
+  width: 100%;
+  height: 100%;
+  display: grid;
+  align-items: center;
+  justify-content: center;
+  align-content: center;
+
+  gap: 1rem;
+}
+
+main.packs div.packs-list {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr;
+
+  gap: 1rem;
+
+  width: 100%;
+}
+
+main.packs div.packs-list button.pack {
+  width: 100%;
+  height: 100%;
+
+  display: grid;
+  grid-template-rows: min-content min-content;
+
+  justify-items: start;
+}
+
+main.packs div.packs-list button.pack p {
+  text-transform: none;
+  color: grey;
+}
+
+main.packs div.packs-list button.pack.completed {
+  border-color: gold;
+}
+
+main.packs button.back {
+  margin-left: auto;
+}
+
+/* Levels view */
+main.levels {
+  width: 100%;
+  height: 100%;
+  display: grid;
+  align-items: center;
+  justify-content: center;
+  align-content: center;
+
+  gap: 1rem;
+}
+
+main.levels div.levels-list {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr;
+
+  overflow-y: auto;
+
+  max-height: 75lvh;
+
+  gap: 1rem;
+
+  width: 100%;
+}
+
+main.levels div.levels-list button.level {
+  width: 100%;
+  height: 100%;
+
+  display: grid;
+  grid-template-rows: min-content min-content;
+
+  justify-items: start;
+}
+
+main.levels div.levels-list button.level.completed {
+  border-color: gold;
+}
+
+main.levels button.back {
+  margin-left: auto;
 }
