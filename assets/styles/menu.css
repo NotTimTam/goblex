@@ -221,7 +221,7 @@ main.saves div.slots div.slot.corrupted p {
 main.saves
   div.slots
   div.slot:not(.corrupted):has(button.select:hover:not(:active)) {
-  translate: 0px -10px;
+  translate: 0px -2px;
   color: #000;
   background-color: #fff;
 }
