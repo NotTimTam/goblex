@@ -94,13 +94,13 @@ export default class Board {
         button.id = "next-level";
         button.innerHTML = "NEXT LEVEL";
         button.onclick = () => {
-          alert("NOT IMPLEMENTED");
+          this.game.nextLevel();
         };
       } else {
         button.id = "retry";
         button.innerHTML = "RETRY";
         button.onclick = () => {
-          this.game.loadLevel(this.__levelSource);
+          this.game.resetLevel();
         };
       }
 

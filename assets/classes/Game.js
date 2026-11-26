@@ -6,9 +6,7 @@ export default class Game {
     this.debug = debug;
     this.screen = "menu";
 
-    // const save = this.__decodeSave(localStorage.getItem("goblex_save"));
-
-    // this.loadLevel();
+    this.packs = { base };
   }
 
   __encodeSave = (obj) =>
@@ -16,6 +14,18 @@ export default class Game {
 
   __decodeSave = (b64) =>
     JSON.parse(new TextDecoder().decode(Uint8Array.fromBase64(b64)));
+
+  saveGame() {
+    if (!this.save) return;
+
+    localStorage.setItem(
+      `goblex_slot_${this.currentSlot + 1}`,
+      this.__encodeSave({
+        ...this.save,
+        playTime: this.save.playTime + performance.now(),
+      }),
+    );
+  }
 
   get screen() {
     return this.__rawCurrentScreen;
@@ -34,7 +44,7 @@ export default class Game {
         this.loadMenu();
         break;
       case "level":
-        this.loadLevel(rest.level);
+        this.loadLevel(...rest.level);
         break;
       default:
         this.loadError();
@@ -46,7 +56,7 @@ export default class Game {
 
   loadError() {
     if (this.debug) {
-      onsole.error("A fatal error occured, game state below for preview:");
+      console.error("A fatal error occured, game state below for preview:");
       console.log(this);
     }
     document.body.innerHTML =
@@ -58,7 +68,17 @@ export default class Game {
       localStorage.getItem("goblex_slot_1"),
       localStorage.getItem("goblex_slot_2"),
       localStorage.getItem("goblex_slot_3"),
-    ].map((slot) => (slot ? this.__decodeSave(slot) : null));
+    ].map((slot) => {
+      if (slot) {
+        try {
+          return this.__decodeSave(slot);
+        } catch (err) {
+          return "error";
+        }
+      } else {
+        return null;
+      }
+    });
 
     document.body.innerHTML = `<main class="saves"></main>`;
 
@@ -73,23 +93,36 @@ export default class Game {
 
       const slotButton = document.createElement("button");
       slotButton.className = "select";
-      slotButton.innerHTML = `<h2>Slot ${+i + 1}</h2><p>${slot ? (slot.playTime < 1000 * 60 * 60 ? `<1H` : `${Math.floor(slot.playTime / 1000 / 60 / 60)}H`) + " of playtime" : "(empty)"}</p>`;
-      slotButton.onclick = () => {
-        this.currentSlot = +i;
-        this.save = slot;
-        if (!slot) {
-          localStorage.setItem(
-            `goblex_slot_${+i + 1}`,
-            this.__encodeSave({
+      slotButton.innerHTML = `<h2>Slot ${+i + 1}</h2>`;
+
+      if (slot === "error") {
+        slotDisplay.classList.toggle("corrupted", true);
+        slotButton.innerHTML += `<p>!SAVE CORRUPTED!</p>`;
+      } else {
+        slotButton.innerHTML += `<p>${slot ? (slot.playTime < 1000 * 60 * 60 ? `<1H` : `${Math.floor(slot.playTime / 1000 / 60 / 60)}H`) + " of playtime" : "(empty)"}</p>`;
+      }
+
+      if (slot !== "error")
+        slotButton.onclick = () => {
+          this.currentSlot = +i;
+          if (!slot) {
+            this.save = {
               playTime: 0,
               level: "base-0",
-            }),
-          );
-          this.screen = { name: "level", level: base[0] };
-        } else {
-          this.screen = { name: "level", level: base[0] };
-        }
-      };
+            };
+
+            localStorage.setItem(
+              `goblex_slot_${this.currentSlot + 1}`,
+              this.__encodeSave(this.save),
+            );
+            this.screen = { name: "level", level: ["base", 0] };
+          } else {
+            this.save = slot;
+
+            const [pack, level] = this.save.level.split("-");
+            this.screen = { name: "level", level: [pack, +level] };
+          }
+        };
 
       slotDisplay.appendChild(slotButton);
 
@@ -100,7 +133,7 @@ export default class Game {
         slotClear.onclick = (e) => {
           e.stopPropagation();
           const conf = confirm(
-            "Are you sure you want to erase this slot. This action is irreversable!",
+            "Are you sure you want to erase this slot? This action is irreversable!",
           );
 
           if (conf) {
@@ -140,7 +173,6 @@ export default class Game {
         label: "play",
         action: () => {
           this.screen = "saves";
-          // this.loadLevel(base[0]);
         },
       },
       {
@@ -148,6 +180,7 @@ export default class Game {
         action: () => {
           this.screen = "settings";
         },
+        disabled: true,
       },
     ];
 
@@ -161,16 +194,42 @@ export default class Game {
     });
   }
 
-  loadLevel(level) {
+  loadLevel(pack, level) {
     document.body.innerHTML = `<main class="game">
       <p class="turn-display">YOUR TURN</p>
       <div class="board"></div>
     </main>
     <footer class="logs"></footer>`;
 
+    this.save.level = `${pack}-${level}`;
+
     this.board = new Board(this, {
       // delayGoblinTurn: false,
-      level,
+      level: this.packs[pack][level],
     });
+  }
+
+  nextLevel() {
+    if (!this.save) return;
+
+    const [currentPack, currentLevel] = this.save.level.split("-");
+
+    const nextLevel = this.packs[currentPack][+currentLevel + 1];
+
+    if (nextLevel) this.loadLevel(currentPack, +currentLevel + 1);
+    else {
+      console.warn("No handling for pack completion");
+      this.screen = "menu";
+    }
+
+    this.saveGame();
+  }
+
+  resetLevel() {
+    if (!this.save) return;
+
+    const [currentPack, currentLevel] = this.save.level.split("-");
+
+    this.loadLevel(currentPack, +currentLevel);
   }
 }

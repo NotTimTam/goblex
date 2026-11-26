@@ -214,7 +214,11 @@ main.saves div.slots div.slot {
   transition: all 0.15s ease-in-out;
 }
 
-main.saves div.slots div.slot:has(button:hover:not(:active)) {
+main.saves div.slots div.slot.corrupted p {
+  color: tomato;
+}
+
+main.saves div.slots div.slot:not(.corrupted):has(button:hover:not(:active)) {
   translate: 0px -10px;
   color: #000;
   background-color: #fff;
@@ -227,6 +231,10 @@ main.saves div.slots div.slot p {
 main.saves div.slots div.slot button.select {
   width: 100%;
   height: 100%;
+}
+
+main.saves div.slots div.slot.corrupted button.select {
+  cursor: not-allowed;
 }
 
 main.saves div.slots div.slot:has(button:hover) button.clear {
