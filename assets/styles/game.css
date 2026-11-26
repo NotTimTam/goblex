@@ -10,6 +10,10 @@ main.game {
   align-self: center;
   justify-self: center;
 
+  min-width: 0;
+
+  width: 100%;
+
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
@@ -27,14 +31,12 @@ p.turn-display {
 /* Board and Tiles */
 
 div.board {
+  height: max-content;
   width: max-content;
   max-width: 100%;
 
-  height: max-content;
-  max-height: 100%;
-
   display: grid;
-  gap: 12px;
+  gap: var(--gap);
 
   align-items: center;
   align-content: center;
@@ -56,6 +58,8 @@ div.board button.tile {
   --size: 72px;
   width: var(--size);
   height: var(--size);
+  max-width: var(--max-tile-width);
+  max-height: var(--max-tile-width);
   background-repeat: no-repeat;
 
   image-rendering: pixelated;

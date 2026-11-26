@@ -194,6 +194,8 @@ export default class Game {
   }
 
   loadLevel(pack, level) {
+    if (this.board) this.board.cleanup();
+
     document.body.innerHTML = `<main class="game">
       <p class="turn-display">YOUR TURN</p>
       <div class="board"></div>

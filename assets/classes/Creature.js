@@ -74,7 +74,6 @@ export default class Creature {
   }
 
   clear() {
-    console.log("CLEAR", this.type);
     this.element.style = null;
     this.element.removeAttribute("type");
     this.element.classList.toggle("dead", false);
@@ -95,7 +94,6 @@ export default class Creature {
   }
 
   graphic() {
-    console.log(this.type);
     const url = new URL(
       `assets/images/${this.creatureType}s/${this.type}.png`,
       document.baseURI,

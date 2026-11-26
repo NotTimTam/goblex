@@ -37,6 +37,11 @@ export default class Board {
     this.board = this.gameElement.querySelector("div.board");
     this.boardWidth = width;
 
+    this.calculateMaxTileSize();
+    this.rerenderListener = window.addEventListener("resize", () => {
+      this.calculateMaxTileSize();
+    });
+
     this.turns = 0;
     this.turnData = {};
 
@@ -54,6 +59,24 @@ export default class Board {
 
       if (e.key === "Escape") this.selectionFocus = null;
     });
+  }
+
+  cleanup() {
+    window.removeEventListener(this.rerenderListener);
+  }
+
+  calculateMaxTileSize() {
+    this.tileGap = window.innerWidth >= 1024 ? 12 : 4;
+    this.board.style.setProperty("--gap", this.tileGap + "px");
+
+    this.board.style.setProperty(
+      "--max-tile-width",
+      `${
+        (this.gameElement.getBoundingClientRect().width -
+          (this.boardWidth - 1) * this.tileGap) /
+        this.boardWidth
+      }px`,
+    );
   }
 
   get endTurnButton() {

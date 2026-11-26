@@ -11,7 +11,7 @@ export const base = {
 
 export const dev = {
   100: {
-    width: 4,
+    width: 16,
     tiles:
       "bear,cat,chicken,cow,deer,dog,duck,elephant,fox,frog,giraffe,hippo,koala,lion,monkey,mouse,owl,panda,penguin,pig,rabbit,raccoon,red_panda,sheep,tiger,turtle,zebra",
   },
