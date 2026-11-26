@@ -331,7 +331,7 @@ export default class Game {
     packsList.className = "packs-list";
 
     const loadPackView = (pack, packData) => {
-      const packSave = this.save.levels[pack];
+      const packSave = this.save.levels[pack] || {};
 
       document.body.innerHTML = `<main class="levels"><h1>Select level</h1></main>`;
 
