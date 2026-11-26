@@ -47,20 +47,15 @@ export default class Goblin extends Creature {
 
     const possibleMoves = [];
 
-    const edibles = this.neighbors
+    this.neighbors
       .filter((n) => n.creatureType === "animal" && !n.dead)
-      .sort(
-        (a, b) =>
-          this.board.distance(this.i, a.i, "chebyshev") -
-          this.board.distance(this.i, b.i, "chebyshev"),
+      .forEach((edible) =>
+        possibleMoves.push({
+          goblin: this,
+          move: "attack",
+          target: edible,
+        }),
       );
-
-    if (edibles.length)
-      possibleMoves.push({
-        goblin: this,
-        move: "attack",
-        target: edibles[0],
-      });
 
     const abilities = goblins[this.type].abilities;
 
@@ -127,8 +122,6 @@ export default class Goblin extends Creature {
         this.lastKill = true;
       }
     } else if (move === "chase") {
-      console.log(this.board.level);
-
       this.i = target;
       this.board.logs.push(
         `${capitalizeWords(this.type)} moves towards a ${targetType}`,
