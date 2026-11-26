@@ -98,8 +98,10 @@ export default class Game {
       if (slot === "error") {
         slotDisplay.classList.toggle("corrupted", true);
         slotButton.innerHTML += `<p>!SAVE CORRUPTED!</p>`;
+      } else if (slot) {
+        slotButton.innerHTML += `<p>${(slot.playTime < 1000 * 60 * 60 ? `<1H` : `${Math.floor(slot.playTime / 1000 / 60 / 60)}H`) + " of playtime"}</p><p>LEVEL - ${slot.level.toUpperCase()}</p>`;
       } else {
-        slotButton.innerHTML += `<p>${slot ? (slot.playTime < 1000 * 60 * 60 ? `<1H` : `${Math.floor(slot.playTime / 1000 / 60 / 60)}H`) + " of playtime" : "(empty)"}</p>`;
+        slotButton.innerHTML += `<p>(empty)</p>`;
       }
 
       if (slot !== "error")
