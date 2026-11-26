@@ -1,12 +1,10 @@
 import Board from "./Board.js";
-import { base } from "../util/levels.js";
+import packs from "../util/levels.js";
 
 export default class Game {
   constructor(debug = false) {
     this.debug = debug;
     this.screen = "menu";
-
-    this.packs = { base };
   }
 
   __encodeSave = (obj) =>
@@ -206,7 +204,7 @@ export default class Game {
 
     this.board = new Board(this, {
       // delayGoblinTurn: false,
-      level: this.packs[pack][level],
+      level: packs[pack][level],
     });
   }
 
@@ -215,7 +213,7 @@ export default class Game {
 
     const [currentPack, currentLevel] = this.save.level;
 
-    const nextLevel = this.packs[currentPack][currentLevel + 1];
+    const nextLevel = packs[currentPack][currentLevel + 1];
 
     if (nextLevel) this.loadLevel(currentPack, currentLevel + 1);
     else {
