@@ -121,7 +121,7 @@ div.board[turn="player"] button.tile.attackable:hover:not(.dead) {
 }
 
 div.board[turn="player"] button.tile.ally:not(.dead),
-div.board[turn="player"]:has(button.tile.ally:not(.dead))
+div.board[turn="player"]:has(button.tile.attackable:not(.dead))
   button.tile:focus[type="animal"]:not(.dead) {
   box-shadow: 0px 0px 10px dodgerblue;
   border-color: dodgerblue;

@@ -101,6 +101,7 @@ export default class Goblin extends Creature {
                 goblin: this,
                 move: "chase",
                 target: this.board.toIndex(...path[0]),
+                targetType: targets[0].type,
               });
 
             break;
@@ -112,7 +113,7 @@ export default class Goblin extends Creature {
     return possibleMoves;
   }
 
-  move({ move, target }) {
+  move({ move, target, targetType }) {
     if (move === "attack") {
       target.health -= this.attack;
 
@@ -121,6 +122,8 @@ export default class Goblin extends Creature {
       );
 
       if (target.health <= 0) {
+        this.board.logs.push(`${capitalizeWords(target.type)} died!`);
+
         this.lastKill = true;
       }
     } else if (move === "chase") {
@@ -128,7 +131,7 @@ export default class Goblin extends Creature {
 
       this.i = target;
       this.board.logs.push(
-        `${capitalizeWords(this.type)} moves towards a ${target.type}`,
+        `${capitalizeWords(this.type)} moves towards a ${targetType}`,
       );
     }
   }

@@ -12,4 +12,4 @@ const game = new Game();
 
 game.currentSlot = 0;
 game.save = game.__decodeSave(localStorage.getItem("goblex_slot_1"));
-game.screen = { name: "level", level: ["dev", 101] };
+game.screen = { name: "level", level: ["base", 2] };

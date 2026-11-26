@@ -205,7 +205,7 @@ export default class Game {
     this.save.level = [pack, level];
 
     this.board = new Board(this, {
-      delayGoblinTurn: false,
+      // delayGoblinTurn: false,
       level: packs[pack][level],
     });
   }

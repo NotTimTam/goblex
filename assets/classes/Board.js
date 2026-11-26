@@ -138,7 +138,7 @@ export default class Board {
           this.logs.push(`The goblin(s) are considering their options...`);
         setTimeout(
           () => this.goblinTurn(),
-          this.delayGoblinTurn ? Math.random() * 1000 + 200 : 0,
+          this.delayGoblinTurn ? Math.random() * 100 + 100 : 0,
         );
       } else if (t === "player") {
         // Setup player turn.
@@ -420,6 +420,12 @@ export default class Board {
   }
 
   async triggerAttack(attacker, creature) {
+    if (
+      attacker.creatureType !== "animal" ||
+      creature.creatureType !== "goblin"
+    )
+      throw new Error("Fight triggered in the wrong direction");
+
     const attackingAnimals = attacker.neighbors.filter(
       (a) => a.creatureType === "animal" && !a.dead,
     );
@@ -427,8 +433,6 @@ export default class Board {
     const attackableGoblins = attacker.neighbors.filter(
       (g) => g.creatureType === "goblin" && !g.dead && g !== creature,
     );
-
-    if (!attackingAnimals.length) return;
 
     this.logs.push(
       `Your ${attackingAnimals.map((a) => a.type).join(", ")} ${attackingAnimals.length > 1 ? "are" : "is"} attacking a ${creature.type} goblin!`,
@@ -461,6 +465,8 @@ export default class Board {
     const setupAttack = (creature) => {
       this.turnData.clearAttack?.();
 
+      this.turnData.selectedAnimal = creature;
+
       const possibleEnemies = creature.neighbors.filter(
         (c) => c.creatureType === "goblin" && !c.dead,
       );
@@ -488,6 +494,7 @@ export default class Board {
           event.relatedTarget?.classList.contains("attackable");
 
         if (
+          this.turnData.selectedAnimal === creature &&
           isAttackTarget &&
           this.turn === "player" &&
           this.turnData.clearAttack === clearAttack
@@ -557,15 +564,15 @@ export default class Board {
       }
     } else {
       // Tile is not empty.
-
       if (creature.creatureType === "animal" && !creature.dead) {
         // Handle animal click.
         setupAttack(creature);
       } else if (
+        this.turnData.selectedAnimal &&
         creature.element.classList.contains("attackable") &&
         !creature.dead
       ) {
-        this.triggerAttack(lastClick, creature);
+        this.triggerAttack(this.turnData.selectedAnimal, creature);
       }
     }
 
