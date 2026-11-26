@@ -391,8 +391,6 @@ export default class Board {
           calculateBoardUtility(calculateMoveOutcome(move)) - before;
       }
 
-      console.log(possibleMoves);
-
       const idealMove = possibleMoves.sort((a, b) => b.utility - a.utility)[0];
 
       idealMove.goblin.move(idealMove);
