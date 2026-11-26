@@ -99,7 +99,7 @@ export default class Game {
         slotDisplay.classList.toggle("corrupted", true);
         slotButton.innerHTML += `<p>!SAVE CORRUPTED!</p>`;
       } else if (slot) {
-        slotButton.innerHTML += `<p>${(slot.playTime < 1000 * 60 * 60 ? `<1H` : `${Math.floor(slot.playTime / 1000 / 60 / 60)}H`) + " of playtime"}</p><p>LEVEL - ${slot.level.toUpperCase()}</p>`;
+        slotButton.innerHTML += `<p>${(slot.playTime < 1000 * 60 * 60 ? `<1H` : `${Math.floor(slot.playTime / 1000 / 60 / 60)}H`) + " of playtime"}</p><p>LEVEL - ${slot.level.join("-").toUpperCase()}</p>`;
       } else {
         slotButton.innerHTML += `<p>(empty)</p>`;
       }
@@ -121,8 +121,7 @@ export default class Game {
           } else {
             this.save = slot;
 
-            const [pack, level] = this.save.level.split("-");
-            this.screen = { name: "level", level: [pack, +level] };
+            this.screen = { name: "level", level: this.save.level };
           }
         };
 
@@ -203,7 +202,7 @@ export default class Game {
     </main>
     <footer class="logs"></footer>`;
 
-    this.save.level = `${pack}-${level}`;
+    this.save.level = [pack, level];
 
     this.board = new Board(this, {
       // delayGoblinTurn: false,
@@ -214,11 +213,11 @@ export default class Game {
   nextLevel() {
     if (!this.save) return;
 
-    const [currentPack, currentLevel] = this.save.level.split("-");
+    const [currentPack, currentLevel] = this.save.level;
 
-    const nextLevel = this.packs[currentPack][+currentLevel + 1];
+    const nextLevel = this.packs[currentPack][currentLevel + 1];
 
-    if (nextLevel) this.loadLevel(currentPack, +currentLevel + 1);
+    if (nextLevel) this.loadLevel(currentPack, currentLevel + 1);
     else {
       console.warn("No handling for pack completion");
       this.screen = "menu";
@@ -230,8 +229,8 @@ export default class Game {
   resetLevel() {
     if (!this.save) return;
 
-    const [currentPack, currentLevel] = this.save.level.split("-");
+    const [currentPack, currentLevel] = this.save.level;
 
-    this.loadLevel(currentPack, +currentLevel);
+    this.loadLevel(currentPack, currentLevel);
   }
 }
