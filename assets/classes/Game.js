@@ -69,7 +69,12 @@ export default class Game {
     ].map((slot) => {
       if (slot) {
         try {
-          return this.__decodeSave(slot);
+          const save = this.__decodeSave(slot);
+
+          if (!save.level || typeof save.level !== "object")
+            throw new Error("Invalid save structure");
+
+          return save;
         } catch (err) {
           return "error";
         }
@@ -97,7 +102,6 @@ export default class Game {
         slotDisplay.classList.toggle("corrupted", true);
         slotButton.innerHTML += `<p>!SAVE CORRUPTED!</p>`;
       } else if (slot) {
-        console.log(slot);
         slotButton.innerHTML += `<p>${(slot.playTime < 1000 * 60 * 60 ? `<1H` : `${Math.floor(slot.playTime / 1000 / 60 / 60)}H`) + " of playtime"}</p><p>LEVEL - ${slot.level.join("-").toUpperCase()}</p>`;
       } else {
         slotButton.innerHTML += `<p>(empty)</p>`;
