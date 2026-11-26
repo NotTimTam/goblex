@@ -1,5 +1,6 @@
 import { EMOTIONS, goblins } from "../util/creatures.js";
 import { capitalizeWords } from "../util/display.js";
+import findPath from "../util/pathfinding.js";
 
 import Creature from "./Creature.js";
 
@@ -34,6 +35,14 @@ export default class Goblin extends Creature {
   }
 
   possibleMoves() {
+    /*
+    Goblin AI breakdown:
+    - A goblin that has the ability to attack on the board always attacks first.
+    - A goblin who does not have the ability to attack, but does have another
+    behavior 'ability' will default to that.
+    - Otherwise, a goblin will do nothing.
+     */
+
     delete this.lastKill;
 
     const possibleMoves = [];
@@ -50,7 +59,53 @@ export default class Goblin extends Creature {
         goblin: this,
         move: "attack",
         target: edibles[0],
-        value: 100,
+      });
+
+    const abilities = goblins[this.type].abilities;
+
+    if (abilities)
+      abilities.forEach((ability) => {
+        switch (ability) {
+          case "chase":
+            const targets = this.board.animals
+              .filter((a) => !a.dead)
+              .sort(
+                (a, b) =>
+                  this.board.distance(this.i, a.i) -
+                  this.board.distance(this.i, b.i),
+              );
+
+            if (
+              !targets.length ||
+              this.board.distance(this.i, targets[0].i) <= 1
+            )
+              return;
+
+            const path = findPath(
+              this.board.toXY(this.i),
+              this.board.toXY(targets[0].i),
+              [
+                ...this.board.creatures
+                  .filter((c) => c !== this && c !== targets[0])
+                  .map((c) => this.board.toXY(c.i)),
+                ...this.board.exits.map((i) => this.board.toXY(i)),
+                ...this.board.walls.map((i) => this.board.toXY(i)),
+              ],
+              this.board.boardWidth,
+              Math.floor(this.board.level.length / this.board.boardWidth),
+            );
+
+            if (path)
+              possibleMoves.push({
+                goblin: this,
+                move: "chase",
+                target: this.board.toIndex(...path[0]),
+              });
+
+            break;
+          default:
+            break;
+        }
       });
 
     return possibleMoves;
@@ -67,6 +122,13 @@ export default class Goblin extends Creature {
       if (target.health <= 0) {
         this.lastKill = true;
       }
+    } else if (move === "chase") {
+      console.log(this.board.level);
+
+      this.i = target;
+      this.board.logs.push(
+        `${capitalizeWords(this.type)} moves towards a ${target.type}`,
+      );
     }
   }
 }

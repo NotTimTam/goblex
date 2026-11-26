@@ -38,23 +38,23 @@ export const animals = {
 
 export const goblins = {
   grunt: { health: 5, attack: 2.5 },
-  mohawk: { health: 15, attack: 4 },
-  horned: { health: 15, attack: 5 },
-  warrior: { health: 15, attack: 6 },
+  mohawk: { health: 15, attack: 4, abilities: ["chase"] },
+  horned: { health: 15, attack: 5, abilities: ["chase"] },
+  warrior: { health: 15, attack: 6, abilities: ["chase"] },
   archer: { health: 8, attack: 8 },
   shaman: { health: 20, attack: 5 },
-  bandit: { health: 1, attack: 50 },
-  assassin: { health: 1, attack: 999 },
+  bandit: { health: 1, attack: 50, abilities: ["chase"] },
+  assassin: { health: 1, attack: 999, abilities: ["chase"] },
   miner: { health: 15, attack: 6 },
   pirate: { health: 20, attack: 6 },
   cyclops: { health: 25, attack: 8 },
-  berserker: { health: 25, attack: 10 },
-  chieftain: { health: 35, attack: 10 },
+  berserker: { health: 25, attack: 10, abilities: ["chase"] },
+  chieftain: { health: 35, attack: 10, abilities: ["chase"] },
   wizard: { health: 50, attack: 15 },
   king: { health: 65, attack: 20 },
-  undead: { health: 75, attack: 25 },
+  undead: { health: 75, attack: 25, abilities: ["chase"] },
   vampire: { health: 100, attack: 30 },
-  demon: { health: 200, attack: 50 },
+  demon: { health: 200, attack: 50, abilities: ["chase"] },
 };
 
 export const healthbar = () => {

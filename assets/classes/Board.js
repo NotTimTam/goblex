@@ -259,6 +259,7 @@ export default class Board {
   goblinTurn() {
     const possibleMoves = [];
 
+    // Gather moves.
     for (const goblin of this.goblins.filter((g) => !g.dead)) {
       possibleMoves.push(...goblin.possibleMoves());
     }
@@ -267,9 +268,25 @@ export default class Board {
       this.logs.push(getRandom(logs.goblin.noMove));
       this.turn = "player";
     } else {
-      const move = possibleMoves.sort((a, b) => b.value - a.value)[0];
+      // Weigh options, and select a move.
+      const calculateBoardUtility = (board) => {
+        return 0;
+      };
 
-      move.goblin.move(move);
+      const calculateMoveOutcome = (move) => {
+        return [];
+      };
+
+      for (const i in possibleMoves) {
+        const boardOutcome = calculateMoveOutcome(possibleMoves[i]);
+        const utility = calculateBoardUtility(boardOutcome);
+
+        possibleMoves[i].utility = utility;
+      }
+
+      const idealMove = possibleMoves.sort((a, b) => b.utility - a.utility)[0];
+
+      idealMove.goblin.move(idealMove);
 
       this.turn = "player";
     }
