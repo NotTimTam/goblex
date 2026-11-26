@@ -602,6 +602,12 @@ export default class Board {
         </div>
       `;
 
+      this.pauseMenu.addEventListener("click", () => this.pause());
+
+      this.pauseMenu.children[0].addEventListener("click", (e) =>
+        e.stopPropagation(),
+      );
+
       const buttons = [
         {
           label: "resume",
