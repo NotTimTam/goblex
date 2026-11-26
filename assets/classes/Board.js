@@ -583,6 +583,56 @@ export default class Board {
     this.__lastClick = i;
   }
 
+  pause() {
+    if (this.pauseMenu) {
+      this.pauseMenu.classList.toggle("close", true);
+      this.pauseMenu.children[0].addEventListener("animationend", (e) => {
+        if (e.animationName === "fight-end") {
+          this.pauseMenu.parentNode.removeChild(this.pauseMenu);
+          this.pauseMenu = null;
+        }
+      });
+    } else {
+      this.pauseMenu = document.createElement("div");
+      this.pauseMenu.className = "pause-menu";
+
+      this.pauseMenu.innerHTML = `
+        <div class="menu-inner">
+          <h2>PAUSED</h2>
+        </div>
+      `;
+
+      const buttons = [
+        {
+          label: "resume",
+          onclick: () => this.pause(),
+        },
+        {
+          label: "levels",
+          onclick: () => (this.game.screen = "levels"),
+        },
+        {
+          label: "home",
+          onclick: () => {
+            this.game.board = null;
+            this.game.screen = "menu";
+          },
+        },
+      ];
+
+      for (const b of buttons) {
+        const button = document.createElement("button");
+        button.className = "default";
+        button.onclick = b.onclick;
+        button.innerHTML = b.label;
+
+        this.pauseMenu.children[0].appendChild(button);
+      }
+
+      document.body.appendChild(this.pauseMenu);
+    }
+  }
+
   buildBoard() {
     const { level, size } = this;
 
@@ -626,6 +676,15 @@ export default class Board {
           ).bind(this)(i, n);
       }
     });
+
+    // Build pause button/menu.
+    this.pauseButton = document.createElement("button");
+    this.pauseButton.className = "pause default";
+    this.pauseButton.innerHTML =
+      "<span></span><span></span><p>Pause the game</p>";
+    this.pauseButton.onclick = () => this.pause();
+
+    document.body.prepend(this.pauseButton);
 
     this.logs.push("Kill all goblins or move all animals to the exit.");
     this.turn = "player";

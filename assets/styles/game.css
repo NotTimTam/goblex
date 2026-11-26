@@ -4,6 +4,44 @@
 
 body:has(main.game) {
   display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: auto 1fr;
+}
+
+body:has(main.game) button.pause {
+  margin-left: auto;
+  margin: 0.5rem 0.5rem 0 auto;
+
+  aspect-ratio: square;
+  width: 33.333px;
+  height: 33.333px;
+
+  display: flex;
+  flex-direction: row;
+  gap: 0.25rem;
+  padding: 0.5rem;
+}
+
+body:has(main.game) button.pause span {
+  background-color: #fff;
+  height: 100%;
+  flex-grow: 2;
+}
+
+body:has(main.game) button.pause:hover:not(:active) span {
+  background-color: #000;
+}
+
+body:has(main.game) button.pause p {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
 }
 
 main.game {
@@ -548,4 +586,51 @@ button.flee {
   right: 0;
 
   margin: 0.5rem;
+}
+
+/* Pause Menu */
+div.pause-menu {
+  overflow: hidden;
+
+  position: absolute;
+  top: 0;
+  left: 0;
+
+  z-index: 99;
+
+  width: 100svw;
+  height: 100svh;
+
+  background: #00000077;
+  backdrop-filter: blur(4px);
+}
+
+div.pause-menu div.menu-inner {
+  position: absolute;
+  border: 1px solid #fff;
+
+  display: flex;
+  flex-direction: column;
+
+  padding: 1rem;
+  gap: 1rem;
+
+  top: 50%;
+  left: 50%;
+
+  animation: fight-appear 0.25s ease-in-out;
+  animation-fill-mode: both;
+
+  transform: translate(-50%, -50%);
+
+  background: #00000077;
+  backdrop-filter: blur(4px);
+}
+
+div.pause-menu.close div.menu-inner {
+  animation: fight-end 0.25s ease-in-out;
+}
+
+div.pause-menu div.menu-inner button {
+  width: 100%;
 }
