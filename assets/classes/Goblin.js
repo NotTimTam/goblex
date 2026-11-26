@@ -51,7 +51,8 @@ export default class Goblin extends Creature {
       .filter((n) => n.creatureType === "animal" && !n.dead)
       .sort(
         (a, b) =>
-          this.board.distance(this.i, a.i) - this.board.distance(this.i, b.i),
+          this.board.distance(this.i, a.i, "chebyshev") -
+          this.board.distance(this.i, b.i, "chebyshev"),
       );
 
     if (edibles.length)
@@ -71,13 +72,13 @@ export default class Goblin extends Creature {
               .filter((a) => !a.dead)
               .sort(
                 (a, b) =>
-                  this.board.distance(this.i, a.i) -
-                  this.board.distance(this.i, b.i),
+                  this.board.distance(this.i, a.i, "chebyshev") -
+                  this.board.distance(this.i, b.i, "chebyshev"),
               );
 
             if (
               !targets.length ||
-              this.board.distance(this.i, targets[0].i) <= 1
+              this.board.distance(this.i, targets[0].i, "chebyshev") <= 1
             )
               return;
 

@@ -62,7 +62,7 @@ export default class Board {
   }
 
   cleanup() {
-    window.removeEventListener(this.rerenderListener);
+    window.removeEventListener("resize", this.rerenderListener);
   }
 
   calculateMaxTileSize() {
@@ -256,6 +256,20 @@ export default class Board {
     return creature;
   }
 
+  convertToContextualLevel() {
+    const board = [];
+
+    this.exits.forEach((exit) => (board[exit] = 1));
+    this.walls.forEach((wall) => (board[wall] = 2));
+    this.creatures.forEach(
+      ({ i, creatureType, type, health, maxHealth, dead, attack }) => {
+        board[i] = { creatureType, type, health, maxHealth, dead, attack };
+      },
+    );
+
+    return board;
+  }
+
   goblinTurn() {
     const possibleMoves = [];
 
@@ -268,20 +282,113 @@ export default class Board {
       this.logs.push(getRandom(logs.goblin.noMove));
       this.turn = "player";
     } else {
+      const currentBoard = this.convertToContextualLevel();
+
       // Weigh options, and select a move.
+      const WIN_SCORE = 10_000;
+
+      const terminalUtility = (board, escapes) => {
+        const pieces = board.filter(Boolean);
+        const animals = pieces.filter((p) => p.creatureType === "animal");
+        const livingAnimals = animals.filter((a) => a.health > 0);
+        const livingGoblins = pieces.filter(
+          (p) => p.creatureType === "goblin" && p.health > 0,
+        );
+
+        // Match this.endCondition's ordering and rules.
+        if (animals.length === 0) return -WIN_SCORE;
+        if (escapes > 0 && livingAnimals.length === 0) return -WIN_SCORE;
+        if (livingGoblins.length === 0) return -WIN_SCORE;
+        if (livingAnimals.length === 0) return WIN_SCORE;
+
+        return null; // Non-terminal; zero is a valid utility.
+      };
+
       const calculateBoardUtility = (board) => {
-        return 0;
+        const terminal = terminalUtility(board, this.escapes);
+        if (terminal !== null) return terminal;
+
+        const pieces = board.filter(Boolean);
+
+        const damageFor = (creatureType) =>
+          pieces
+            .filter((p) => p.creatureType === creatureType)
+            .reduce((sum, p) => sum + (1 - p.health / p.maxHealth), 0);
+
+        const animalDamage = damageFor("animal");
+        const goblinDamage = damageFor("goblin");
+
+        const positioned = board.flatMap((piece, i) =>
+          piece && typeof piece === "object" ? [{ ...piece, i }] : [],
+        );
+
+        const livingAnimals = positioned.filter(
+          (p) => p.creatureType === "animal" && p.health > 0,
+        );
+        const livingGoblins = positioned.filter(
+          (p) => p.creatureType === "goblin" && p.health > 0,
+        );
+
+        const goblinPressure = livingAnimals.reduce((sum, animal) => {
+          const nearestGoblinDistance = Math.min(
+            ...livingGoblins.map((goblin) =>
+              this.distance(animal.i, goblin.i, "chebyshev"),
+            ),
+          );
+          return sum + 1 / (nearestGoblinDistance + 1);
+        }, 0);
+
+        const exitProgress = livingAnimals.reduce((sum, animal) => {
+          if (!this.exits.length) return sum;
+
+          const nearestExitDistance = Math.min(
+            ...this.exits.map((exit) =>
+              this.distance(animal.i, exit, "chebyshev"),
+            ),
+          );
+          return sum + 1 / (nearestExitDistance + 1);
+        }, 0);
+
+        return (
+          10 * animalDamage -
+          10 * goblinDamage +
+          2 * goblinPressure -
+          2 * exitProgress
+        );
       };
 
       const calculateMoveOutcome = (move) => {
-        return [];
+        const outcome = JSON.parse(JSON.stringify(currentBoard));
+
+        switch (move.move) {
+          case "attack":
+            const target = outcome[move.target.i];
+            outcome[move.target.i] = {
+              ...target,
+              health: Math.max(target.health - move.goblin.attack, 0),
+              dead: target.health - move.goblin.attack <= 0,
+            };
+            break;
+
+          case "chase":
+            outcome[move.target] = outcome[move.goblin.i];
+            outcome[move.goblin.i] = 0;
+            break;
+
+          default:
+            break;
+        }
+
+        return outcome;
       };
 
       for (const i in possibleMoves) {
-        const boardOutcome = calculateMoveOutcome(possibleMoves[i]);
-        const utility = calculateBoardUtility(boardOutcome);
+        const move = possibleMoves[i];
 
-        possibleMoves[i].utility = utility;
+        const before = calculateBoardUtility(currentBoard);
+
+        move.utility =
+          calculateBoardUtility(calculateMoveOutcome(move)) - before;
       }
 
       const idealMove = possibleMoves.sort((a, b) => b.utility - a.utility)[0];
