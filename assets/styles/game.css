@@ -8,42 +8,6 @@ body:has(main.game) {
   grid-template-rows: auto 1fr;
 }
 
-body:has(main.game) button.pause {
-  margin-left: auto;
-  margin: 0.5rem 0.5rem 0 auto;
-
-  aspect-ratio: square;
-  width: 33.333px;
-  height: 33.333px;
-
-  display: flex;
-  flex-direction: row;
-  gap: 0.25rem;
-  padding: 0.5rem;
-}
-
-body:has(main.game) button.pause span {
-  background-color: #fff;
-  height: 100%;
-  flex-grow: 2;
-}
-
-body:has(main.game) button.pause:hover:not(:active) span {
-  background-color: #000;
-}
-
-body:has(main.game) button.pause p {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  padding: 0;
-  margin: -1px;
-  overflow: hidden;
-  clip: rect(0, 0, 0, 0);
-  white-space: nowrap;
-  border-width: 0;
-}
-
 main.game {
   align-self: center;
   justify-self: center;
@@ -588,7 +552,53 @@ button.flee {
   margin: 0.5rem;
 }
 
+/* Page Header */
+body:has(main.game) header {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+}
+
+body:has(main.game) header p.points {
+  margin: 0.5rem 0 0 0.5rem;
+}
+
 /* Pause Menu */
+body:has(main.game) header button.pause {
+  margin-left: auto;
+  margin: 0.5rem 0.5rem 0 auto;
+
+  aspect-ratio: square;
+  width: 33.333px;
+  height: 33.333px;
+
+  display: flex;
+  flex-direction: row;
+  gap: 0.25rem;
+  padding: 0.5rem;
+}
+
+body:has(main.game) header button.pause span {
+  background-color: #fff;
+  height: 100%;
+  flex-grow: 2;
+}
+
+body:has(main.game) header button.pause:hover:not(:active) span {
+  background-color: #000;
+}
+
+body:has(main.game) header button.pause p {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
 div.pause-menu {
   overflow: hidden;
 

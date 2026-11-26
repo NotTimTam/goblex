@@ -86,7 +86,7 @@ export default class Board {
   set points(n) {
     this.__rawPoints = n;
 
-    console.log(n, "Earned points:", n - (this.__rawPoints ?? 0));
+    if (this.pointsDisplay) this.pointsDisplay.children[0].innerHTML = n;
   }
 
   get endTurnButton() {
@@ -697,14 +697,23 @@ export default class Board {
       }
     });
 
-    // Build pause button/menu.
+    // Build pause button/menu and points display.
+    const header = document.createElement("header");
+
+    this.pointsDisplay = document.createElement("p");
+    this.pointsDisplay.className = "points";
+    this.pointsDisplay.innerHTML = `<b>0</b>PTS`;
+
     this.pauseButton = document.createElement("button");
     this.pauseButton.className = "pause default";
     this.pauseButton.innerHTML =
       "<span></span><span></span><p>Pause the game</p>";
     this.pauseButton.onclick = () => this.pause();
 
-    document.body.prepend(this.pauseButton);
+    header.appendChild(this.pointsDisplay);
+    header.appendChild(this.pauseButton);
+
+    document.body.prepend(header);
 
     this.logs.push("Kill all goblins or move all animals to the exit.");
     this.turn = "player";
