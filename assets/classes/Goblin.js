@@ -5,13 +5,12 @@ import Creature from "./Creature.js";
 
 export default class Goblin extends Creature {
   constructor(board, i, type) {
-    if (!(type in goblins)) throw new Error("No goblin exists with that type.");
+    if (!(type in goblins))
+      throw new Error(`No goblins exists with type "${type}"`);
 
     const config = goblins[type];
 
-    super(board, i, "goblin");
-    this.type = type;
-    this.i = i;
+    super(board, i, "goblin", type);
 
     this.health = config.health;
     this.maxHealth = config.health;

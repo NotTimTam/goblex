@@ -1,9 +1,10 @@
 import { healthbar } from "../util/creatures.js";
 
 export default class Creature {
-  constructor(board, i, creatureType) {
+  constructor(board, i, creatureType, type) {
     this.board = board;
     this.creatureType = creatureType;
+    this.type = type;
 
     this.__rawI = null;
     this.i = i;
@@ -42,7 +43,7 @@ export default class Creature {
   }
 
   set i(n) {
-    if (this.element) {
+    if (this.__rawI !== null && this.element) {
       this.clear();
     }
 
@@ -73,6 +74,7 @@ export default class Creature {
   }
 
   clear() {
+    console.log("CLEAR", this.type);
     this.element.style = null;
     this.element.removeAttribute("type");
     this.element.classList.toggle("dead", false);
@@ -93,11 +95,14 @@ export default class Creature {
   }
 
   graphic() {
+    console.log(this.type);
     const url = new URL(
       `assets/images/${this.creatureType}s/${this.type}.png`,
       document.baseURI,
     );
+
     this.element.setAttribute("type", this.creatureType);
+    this.element.setAttribute("url", url);
     this.element.style.backgroundImage = `url("${url}")`;
 
     this.genericAnimate();

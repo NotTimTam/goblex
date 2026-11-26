@@ -28,7 +28,7 @@ export default class Board {
 
     this.level =
       typeof tiles === "string"
-        ? tiles.split(",").map((c) => (!isNaN(+c) ? +c : c))
+        ? tiles.split(",").map((c) => (!isNaN(+c) ? +c : c.trim()))
         : tiles;
     this.size = this.level.length;
 

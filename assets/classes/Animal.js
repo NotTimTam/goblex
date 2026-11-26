@@ -4,13 +4,11 @@ import Creature from "./Creature.js";
 export default class Animal extends Creature {
   constructor(board, i, type) {
     if (!(type in animals))
-      throw new Error("No animals exists with that type.");
+      throw new Error(`No animals exists with type "${type}"`);
 
     const config = animals[type];
 
-    super(board, i, "animal");
-    this.type = type;
-    this.i = i;
+    super(board, i, "animal", type);
 
     this.health = config.health;
     this.maxHealth = config.health;
