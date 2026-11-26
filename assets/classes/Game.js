@@ -97,6 +97,7 @@ export default class Game {
         slotDisplay.classList.toggle("corrupted", true);
         slotButton.innerHTML += `<p>!SAVE CORRUPTED!</p>`;
       } else if (slot) {
+        console.log(slot);
         slotButton.innerHTML += `<p>${(slot.playTime < 1000 * 60 * 60 ? `<1H` : `${Math.floor(slot.playTime / 1000 / 60 / 60)}H`) + " of playtime"}</p><p>LEVEL - ${slot.level.join("-").toUpperCase()}</p>`;
       } else {
         slotButton.innerHTML += `<p>(empty)</p>`;
@@ -108,7 +109,7 @@ export default class Game {
           if (!slot) {
             this.save = {
               playTime: 0,
-              level: "base-0",
+              level: ["base", 0],
             };
 
             localStorage.setItem(

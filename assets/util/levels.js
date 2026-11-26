@@ -5,7 +5,7 @@ export const base = {
   },
   1: {
     width: 3,
-    tiles: "0,1,0,0,0,0,grunt,2,grunt,0,0,0,0,0,0,mouse,0,mouse,0,0,0",
+    tiles: "0,1,0,0,0,0,grunt,0,grunt,0,0,0,0,0,0,mouse,0,mouse,0,0,0",
   },
   2: {
     width: 3,
