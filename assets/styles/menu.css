@@ -218,7 +218,9 @@ main.saves div.slots div.slot.corrupted p {
   color: tomato;
 }
 
-main.saves div.slots div.slot:not(.corrupted):has(button:hover:not(:active)) {
+main.saves
+  div.slots
+  div.slot:not(.corrupted):has(button.select:hover:not(:active)) {
   translate: 0px -10px;
   color: #000;
   background-color: #fff;
@@ -237,16 +239,10 @@ main.saves div.slots div.slot.corrupted button.select {
   cursor: not-allowed;
 }
 
-main.saves div.slots div.slot:has(button:hover) button.clear {
-  display: block;
-}
-
 main.saves div.slots div.slot button.clear {
   position: absolute;
   bottom: 100%;
   right: 0.5rem;
-
-  display: none;
 
   color: #fff;
   background-color: tomato;

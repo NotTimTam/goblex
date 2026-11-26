@@ -114,6 +114,8 @@ export default class Game {
             this.save = {
               playTime: 0,
               level: ["base", 0],
+              levels: [],
+              points: 0,
             };
 
             localStorage.setItem(
