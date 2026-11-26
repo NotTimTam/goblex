@@ -163,7 +163,7 @@ export default class Game {
 
     document.body.innerHTML = `<main class="screen">
         <header>
-            <h1>GOBEX</h1>
+            <h1>GOBLEX</h1>
             <p>( goblin + codex )</p>
         </header>
     </main>`;
