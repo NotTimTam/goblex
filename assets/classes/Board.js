@@ -300,11 +300,8 @@ export default class Board {
       (a) => a.creatureType === "animal" && !a.dead,
     );
 
-    const attackableGoblins = creature.neighbors.filter(
-      (g) =>
-        g.creatureType === "goblin" &&
-        !g.dead &&
-        attacker.neighbors.find((f) => f === g), // The only neighboring goblins that come through in a fight are goblins that also neighbors of the attacker.
+    const attackableGoblins = attacker.neighbors.filter(
+      (g) => g.creatureType === "goblin" && !g.dead && g !== creature,
     );
 
     if (!attackingAnimals.length) return;
