@@ -22,7 +22,7 @@ export default class Animal extends Creature {
     this.clear();
 
     this.board.escapes++;
-    this.board.points += 100;
+    this.board.points += this.health;
 
     this.board.logs.push(`Your ${this.type} made it to an exit!`);
   }
