@@ -9,7 +9,7 @@ export const base = {
   },
   2: {
     width: 3,
-    tiles: "0,1,0,0,0,0,0,berserker,0,0,0,0,0,0,0,mouse,0,mouse,0,0,0",
+    tiles: "0,1,0,0,0,0,0,mohawk,0,0,0,0,0,0,0,frog,0,mouse,0,0,0",
   },
 };
 
