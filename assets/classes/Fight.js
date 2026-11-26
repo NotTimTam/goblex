@@ -199,6 +199,9 @@ export default class Fight {
       }
     } else {
       creature.health -= this.animals[this.currentAnimal].attack;
+
+      if (creature.health <= 0) this.board.points += creature.maxHealth;
+
       this.graphics
         .querySelector(
           `button.goblin[index="${this.goblins.indexOf(creature)}"] div.sprite`,

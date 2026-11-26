@@ -79,6 +79,16 @@ export default class Board {
     );
   }
 
+  get points() {
+    return this.__rawPoints ?? 0;
+  }
+
+  set points(n) {
+    this.__rawPoints = n;
+
+    console.log(n, "Earned points:", n - (this.__rawPoints ?? 0));
+  }
+
   get endTurnButton() {
     return this.gameElement.querySelector("button#end-turn");
   }
@@ -115,7 +125,7 @@ export default class Board {
 
       if (end === "win") {
         // Record to save that this level is complete.
-        this.game.completeLevel(0);
+        this.game.completeLevel(this.points);
 
         // Create next-level button.
         button.id = "next-level";

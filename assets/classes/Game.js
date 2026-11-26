@@ -39,18 +39,12 @@ export default class Game {
     });
   }
 
-  __encodeSave = (obj) =>
-    new TextEncoder().encode(JSON.stringify(obj)).toBase64();
-
-  __decodeSave = (b64) =>
-    JSON.parse(new TextDecoder().decode(Uint8Array.fromBase64(b64)));
-
   saveGame() {
     if (!this.save) return;
 
     localStorage.setItem(
       `goblex_slot_${this.currentSlot + 1}`,
-      this.__encodeSave({
+      JSON.stringify({
         ...this.save,
         playTime: this.save.playTime + performance.now(),
       }),
@@ -106,7 +100,7 @@ export default class Game {
     ].map((slot) => {
       if (slot) {
         try {
-          const save = this.__decodeSave(slot);
+          const save = JSON.parse(slot);
 
           if (!save.level || typeof save.level !== "object")
             throw new Error("Invalid save structure");
@@ -152,12 +146,11 @@ export default class Game {
               playTime: 0,
               level: ["base", 0],
               levels: {},
-              points: 0,
             };
 
             localStorage.setItem(
               `goblex_slot_${this.currentSlot + 1}`,
-              this.__encodeSave(this.save),
+              JSON.stringify(this.save),
             );
             this.screen = { name: "level", level: ["base", 0] };
           } else {
@@ -466,15 +459,21 @@ export default class Game {
 
     const [currentPack, currentLevel] = this.save.level;
 
-    const levelAlreadyWon =
-      this.save.levels[currentPack] &&
-      this.save.levels[currentPack][currentLevel] &&
-      this.save.levels[currentPack][currentLevel].w;
-
     if (!this.save.levels[currentPack]) this.save.levels[currentPack] = {};
 
-    this.save.levels[currentPack][currentLevel] = { w: true, pts: points };
-    if (!levelAlreadyWon) this.save.points += points;
+    const currentLevelData = this.save.levels[currentPack][currentLevel];
+
+    this.save.levels[currentPack][currentLevel] = {
+      ...(currentLevelData || {}),
+      w: true,
+    };
+
+    // Only modify the saved points value if the user managed to extract more points on this turn.
+    if (
+      !currentLevelData ||
+      (currentLevelData && points > currentLevelData.points)
+    )
+      this.save.levels[currentPack][currentLevel].points = points;
 
     this.saveGame();
   }
