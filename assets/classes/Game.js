@@ -359,21 +359,7 @@ export default class Game {
       document.body.children[0].appendChild(back);
     };
 
-    Object.entries({
-      ...packs,
-      extreme: { data: {} },
-      dungeon: { data: {} },
-      eggplant: { data: {} },
-      bodycam: { data: {} },
-      greg: { data: {} },
-      egg: { data: {} },
-      leg: { data: {} },
-      fuckyou: { data: {} },
-      eatmy: { data: {} },
-      peenar: { data: {} },
-      please: { data: {} },
-      bro: { data: {} },
-    })
+    Object.entries(packs)
       .filter(([_, d]) => !d.hidden)
       .forEach(([pack, packData]) => {
         const packButton = document.createElement("button");
