@@ -300,13 +300,20 @@ export default class Board {
       (a) => a.creatureType === "animal" && !a.dead,
     );
 
+    const attackableGoblins = creature.neighbors.filter(
+      (g) => g.creatureType === "goblin" && !g.dead,
+    );
+
     if (!attackingAnimals.length) return;
 
     this.logs.push(
       `Your ${attackingAnimals.map((a) => a.type).join(", ")} ${attackingAnimals.length > 1 ? "are" : "is"} attacking a ${creature.type} goblin!`,
     );
 
-    this.turnData.fight = new Fight(this, attackingAnimals, [creature]);
+    this.turnData.fight = new Fight(this, attackingAnimals, [
+      ...attackableGoblins,
+      creature,
+    ]);
 
     const result = await this.turnData.fight.start();
     this.logs.push(

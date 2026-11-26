@@ -11,9 +11,13 @@ export const base = {
 
 export const dev = {
   100: {
-    width: 16,
+    width: 27,
     tiles:
-      "bear,cat,chicken,cow,deer,dog,duck,elephant,fox,frog,giraffe,hippo,koala,lion,monkey,mouse,owl,panda,penguin,pig,rabbit,raccoon,red_panda,sheep,tiger,turtle,zebra",
+      "bear,cat,chicken,cow,deer,dog,duck,elephant,fox,frog,giraffe,hippo,koala,lion,monkey,mouse,owl,panda,penguin,pig,rabbit,raccoon,red_panda,sheep,tiger,turtle,zebra,\
+      0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,\
+      archer,assassin,bandit,berserker,chieftain,cyclops,demon,grunt,horned,king,miner,mohawk,pirate,shaman,undead,vampire,warrior,wizard,0,0,0,0,0,0,0,0,0,\
+      2,0,2,0,2,0,2,0,2,0,2,0,2,0,2,0,2,0,2,0,2,0,2,0,2,0,2,\
+      1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1",
   },
   101: {
     width: 8,
