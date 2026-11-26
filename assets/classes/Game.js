@@ -6,6 +6,37 @@ export default class Game {
   constructor(debug = false) {
     this.debug = debug;
     this.screen = "menu";
+
+    this.__keys = [];
+    this.__hacks = {};
+    window.addEventListener("keydown", (e) => {
+      this.__keys = [
+        ...this.__keys,
+        (() => {
+          switch (e.key) {
+            case "ArrowUp":
+            case "ArrowDown":
+            case "ArrowLeft":
+            case "ArrowRight":
+              return e.key.replace("Arrow", "").toLowerCase();
+            default:
+              return e.key.toLowerCase();
+          }
+        })(),
+      ].slice(-20);
+
+      const keyMap = this.__keys.join("-");
+
+      if (
+        keyMap.includes("up-up-down-down-left-right-left-right-b-a-enter") &&
+        this.screen === "levels"
+      ) {
+        this.__keys = [];
+
+        this.__hacks.unlockHiddenPacks = true;
+        this.screen = "levels";
+      }
+    });
   }
 
   __encodeSave = (obj) =>
@@ -360,7 +391,7 @@ export default class Game {
     };
 
     Object.entries(packs)
-      .filter(([_, d]) => !d.hidden)
+      .filter(([_, d]) => (this.__hacks.unlockHiddenPacks ? true : !d.hidden))
       .forEach(([pack, packData]) => {
         const packButton = document.createElement("button");
 

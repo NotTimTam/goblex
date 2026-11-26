@@ -53,3 +53,7 @@ button:disabled {
   opacity: 0.5;
   pointer-events: none;
 }
+
+button:focus {
+  outline: 2px solid dodgerblue;
+}
