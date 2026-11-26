@@ -68,39 +68,49 @@ export default class Fight {
   goblinTurn() {
     let timeout = 0;
 
-    this.goblins
-      .filter((g) => !g.dead)
-      .forEach((goblin, index, arr) => {
-        const hit = () => {
-          const targets = this.animals.filter((a) => !a.dead);
-          const i = Math.floor(Math.random() * targets.length);
-          const target = targets[i];
+    let turns = [];
 
-          target.health -= goblin.attack;
-          this.graphics
-            .querySelector(
-              `button.animal[index="${this.animals.indexOf(target)}"] div.sprite`,
-            )
-            .classList.toggle("hit", true);
+    const livingGoblins = this.goblins.filter((g) => !g.dead);
 
-          this.board.logs.push(
-            `${capitalizeWords(goblin.type)} attacked ${target.type} for ${goblin.attack}HP`,
-          );
+    for (const [index, goblin] of livingGoblins.entries()) {
+      const hit = () => {
+        const targets = this.animals.filter((a) => !a.dead);
 
-          if (target.health <= 0) {
-            goblin.lastKill = true;
-          }
+        const i = Math.floor(Math.random() * targets.length);
+        const target = targets[i];
 
-          this.animateCreatures();
+        target.health -= goblin.attack;
+        this.graphics
+          .querySelector(
+            `button.animal[index="${this.animals.indexOf(target)}"] div.sprite`,
+          )
+          .classList.toggle("hit", true);
 
-          if (index === arr.length - 1) this.turn = "player";
-        };
+        this.board.logs.push(
+          `${capitalizeWords(goblin.type)} attacked ${target.type} for ${goblin.attack}HP`,
+        );
 
-        if (this.board.delayGoblinTurn) {
-          timeout += Math.random() * 100 + 500;
-          setTimeout(hit, timeout);
-        } else hit();
-      });
+        if (target.health <= 0) {
+          goblin.lastKill = true;
+        }
+
+        this.animateCreatures();
+
+        if (this.endCondition) {
+          if (this.board.delayGoblinTurn)
+            turns.forEach((turn) => clearTimeout(turn));
+          this.turn = "player";
+          return;
+        }
+
+        if (index === livingGoblins.length - 1) this.turn = "player";
+      };
+
+      if (this.board.delayGoblinTurn) {
+        timeout += Math.random() * 100 + 500;
+        turns.push(setTimeout(hit, timeout));
+      } else hit();
+    }
   }
 
   set turn(t) {
@@ -165,7 +175,7 @@ export default class Fight {
     WIN CONDITIONS:
     - All goblins are dead.
     */
-    if (!this.goblins.find((a) => !a.dead)) return "win";
+    if (!this.goblins.find((g) => !g.dead)) return "win";
 
     /*
     LOSS CONDITIONS:

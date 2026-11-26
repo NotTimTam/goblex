@@ -295,13 +295,16 @@ export default class Board {
     return this.animals.some((animal) => this.canAnimalAttack(animal));
   }
 
-  async triggerAttack(creature) {
-    const attackingAnimals = creature.neighbors.filter(
+  async triggerAttack(attacker, creature) {
+    const attackingAnimals = attacker.neighbors.filter(
       (a) => a.creatureType === "animal" && !a.dead,
     );
 
     const attackableGoblins = creature.neighbors.filter(
-      (g) => g.creatureType === "goblin" && !g.dead,
+      (g) =>
+        g.creatureType === "goblin" &&
+        !g.dead &&
+        attacker.neighbors.find((f) => f === g), // The only neighboring goblins that come through in a fight are goblins that also neighbors of the attacker.
     );
 
     if (!attackingAnimals.length) return;
@@ -310,10 +313,11 @@ export default class Board {
       `Your ${attackingAnimals.map((a) => a.type).join(", ")} ${attackingAnimals.length > 1 ? "are" : "is"} attacking a ${creature.type} goblin!`,
     );
 
-    this.turnData.fight = new Fight(this, attackingAnimals, [
-      ...attackableGoblins,
-      creature,
-    ]);
+    this.turnData.fight = new Fight(
+      this,
+      [attacker, ...attackingAnimals],
+      [creature, ...attackableGoblins],
+    );
 
     const result = await this.turnData.fight.start();
     this.logs.push(
@@ -425,7 +429,7 @@ export default class Board {
         creature.element.classList.contains("attackable") &&
         !creature.dead
       ) {
-        this.triggerAttack(creature);
+        this.triggerAttack(lastClick, creature);
       }
     }
 
