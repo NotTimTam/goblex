@@ -219,6 +219,8 @@ export default class Fight {
 
       this.animateCreatures();
     }
+
+    if (this.endCondition) this.turn = "goblin";
   }
 
   __createFormation(creatures, container, side) {
