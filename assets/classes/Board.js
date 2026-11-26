@@ -344,12 +344,17 @@ export default class Board {
         (c) => c.creatureType === "goblin" && !c.dead,
       );
 
+      const possibleAllies = creature.neighbors.filter(
+        (c) => c.creatureType === "animal" && !c.dead,
+      );
+
       const selectedElement = creature.element;
 
       const clearAttack = () => {
         possibleEnemies.forEach((enemy) =>
           enemy.element.classList.remove("attackable"),
         );
+        possibleAllies.forEach((ally) => ally.element.classList.remove("ally"));
         selectedElement.removeEventListener("blur", keepFocus);
       };
 
@@ -363,7 +368,7 @@ export default class Board {
           this.turnData.clearAttack === clearAttack
         ) {
           selectedElement.focus();
-        }
+        } else clearAttack();
       };
 
       this.turnData.clearAttack = clearAttack;
@@ -373,6 +378,8 @@ export default class Board {
       );
 
       if (possibleEnemies.length) {
+        possibleAllies.forEach((enemy) => enemy.element.classList.add("ally"));
+
         selectedElement.addEventListener("blur", keepFocus);
         selectedElement.focus();
       }
