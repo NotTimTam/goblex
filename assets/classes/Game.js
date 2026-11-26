@@ -1,5 +1,6 @@
 import Board from "./Board.js";
 import packs from "../util/levels.js";
+import { animals, goblins } from "../util/creatures.js";
 
 export default class Game {
   constructor(debug = false) {
@@ -231,6 +232,62 @@ export default class Game {
     });
   }
 
+  buildLevelPreview(levelData) {
+    const canvas = document.createElement("canvas");
+    const ctx = canvas.getContext("2d");
+
+    const tiles = levelData.tiles.split(",");
+
+    const SCALE = 32;
+
+    ctx.canvas.width = levelData.width * SCALE - 1;
+    ctx.canvas.height = Math.floor(tiles.length / levelData.width) * SCALE - 1;
+
+    ctx.lineWidth = 1;
+
+    tiles.forEach((tile, i) => {
+      tile = isNaN(tile) ? tile.trim() : +tile;
+
+      const [x, y] = [i % levelData.width, Math.floor(i / levelData.width)];
+
+      ctx.fillStyle = "#cecece";
+      ctx.fillRect(x * SCALE, y * SCALE, SCALE - 1, SCALE - 1);
+
+      switch (tile) {
+        case 0:
+          ctx.fillStyle = "black";
+          break;
+        case 1:
+          ctx.fillStyle = "green";
+          break;
+        case 2:
+          ctx.fillStyle = "grey";
+          break;
+        default:
+          const creature = animals[tile] || goblins[tile];
+          ctx.fillStyle = creature ? creature.color : "red";
+          break;
+      }
+
+      ctx.fillRect(x * SCALE + 1, y * SCALE + 1, SCALE - 3, SCALE - 3);
+    });
+
+    return new Promise((resolve, reject) => {
+      canvas.toBlob((blob) => {
+        if (!blob) return reject(new Error("Failed to create blob"));
+
+        const url = URL.createObjectURL(blob);
+        const img = document.createElement("img");
+        img.onload = () => {
+          URL.revokeObjectURL(url);
+          resolve(img);
+        };
+        img.onerror = reject;
+        img.src = url;
+      }, "image/png");
+    });
+  }
+
   loadLevels({ from }) {
     if (!this.save) return;
 
@@ -249,6 +306,24 @@ export default class Game {
 
       const levelList = document.createElement("div");
       levelList.className = "levels-list";
+      levelList.addEventListener(
+        "wheel",
+        (e) => {
+          // Ignore if the user is already scrolling horizontally
+          if (Math.abs(e.deltaX) > Math.abs(e.deltaY)) return;
+
+          // Let the page scroll normally once we hit either edge
+          const atStart = levelList.scrollLeft <= 0 && e.deltaY < 0;
+          const atEnd =
+            Math.ceil(levelList.scrollLeft + levelList.clientWidth) >=
+              levelList.scrollWidth && e.deltaY > 0;
+          if (atStart || atEnd) return;
+
+          e.preventDefault();
+          levelList.scrollLeft += e.deltaY;
+        },
+        { passive: false },
+      );
 
       for (const [i, level] of Object.entries(packData.data)) {
         const levelButton = document.createElement("button");
@@ -258,7 +333,7 @@ export default class Game {
         const levelCompleted = packSave && packSave[+i]?.w;
 
         levelButton.className = "level default";
-        levelButton.innerHTML = i;
+        levelButton.innerHTML = `<p>${pack}-${i}</p>`;
 
         if (levelCompleted) levelButton.classList.toggle("completed", true);
 
@@ -268,6 +343,10 @@ export default class Game {
         else levelButton.disabled = true;
 
         levelList.appendChild(levelButton);
+
+        setTimeout(async () => {
+          levelButton.appendChild(await this.buildLevelPreview(level));
+        }, 0);
       }
 
       document.body.children[0].appendChild(levelList);
