@@ -337,6 +337,7 @@ main.levels div.levels-list button.level {
   height: 100%;
 
   gap: 0.25rem;
+  padding: 0.5rem;
 
   flex-basis: 0;
 
@@ -344,6 +345,8 @@ main.levels div.levels-list button.level {
   grid-template-rows: min-content min-content;
 
   justify-items: start;
+
+  transition: all 0.25s ease-in-out;
 }
 
 main.levels div.levels-list button.level.completed {
@@ -352,10 +355,12 @@ main.levels div.levels-list button.level.completed {
 
 main.levels div.levels-list button.level img {
   image-rendering: pixelated;
+
+  transition: all 0.25s ease-in-out;
 }
 
 main.levels div.levels-list button.level:hover img {
-  filter: invert(100%);
+  filter: invert(75%);
 }
 
 main.levels button.back {

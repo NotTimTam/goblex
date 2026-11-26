@@ -550,8 +550,12 @@ export default class Board {
           lastClick.i = i;
           this.turnData.moved = true;
 
-          // Check if the player moved to an exit.
-          if (this.exits.includes(i)) lastClick.exit();
+          // Check if the player moved to an exit. If so end their turn.
+          if (this.exits.includes(i)) {
+            lastClick.exit();
+            this.turn = "goblin";
+            return;
+          }
 
           this.animateCreatures();
 
