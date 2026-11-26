@@ -351,10 +351,14 @@ export default class Board {
       const selectedElement = creature.element;
 
       const clearAttack = () => {
-        possibleEnemies.forEach((enemy) =>
-          enemy.element.classList.remove("attackable"),
-        );
-        possibleAllies.forEach((ally) => ally.element.classList.remove("ally"));
+        possibleEnemies.forEach((enemy) => {
+          enemy.element.classList.remove("attackable");
+          enemy.element.style.setProperty("--delay", null);
+        });
+        possibleAllies.forEach((ally) => {
+          ally.element.classList.remove("ally");
+          ally.element.style.setProperty("--delay", null);
+        });
         selectedElement.removeEventListener("blur", keepFocus);
       };
 
@@ -373,12 +377,16 @@ export default class Board {
 
       this.turnData.clearAttack = clearAttack;
 
-      possibleEnemies.forEach((enemy) =>
-        enemy.element.classList.add("attackable"),
-      );
+      possibleEnemies.forEach((enemy, i) => {
+        enemy.element.classList.add("attackable");
+        enemy.element.style.setProperty("--delay", `${i * 100}ms`);
+      });
 
       if (possibleEnemies.length) {
-        possibleAllies.forEach((enemy) => enemy.element.classList.add("ally"));
+        possibleAllies.forEach((ally, i) => {
+          ally.element.classList.add("ally");
+          ally.element.style.setProperty("--delay", `${i * 100}ms`);
+        });
 
         selectedElement.addEventListener("blur", keepFocus);
         selectedElement.focus();

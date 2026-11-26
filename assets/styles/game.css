@@ -112,15 +112,22 @@ div.board button.tile.dead {
 div.board[turn="player"] button.tile.attackable:not(.dead) {
   box-shadow: 0px 0px 10px tomato;
   border-color: tomato;
+  animation: bob-goblin 1s ease infinite;
+  animation-delay: var(--delay, 0);
 }
 
 div.board[turn="player"] button.tile.attackable:hover:not(.dead) {
   box-shadow: 0px 0px 20px tomato;
 }
 
-div.board[turn="player"] button.tile.ally:not(.dead) {
+div.board[turn="player"] button.tile.ally:not(.dead),
+div.board[turn="player"]:has(button.tile.ally:not(.dead))
+  button.tile:focus[type="animal"]:not(.dead) {
   box-shadow: 0px 0px 10px dodgerblue;
   border-color: dodgerblue;
+  --movement: 1.5px;
+  animation: bob-animal 1s ease infinite;
+  animation-delay: var(--delay, 0);
 }
 
 div.board[turn="player"] button.tile.ally:hover:not(.dead) {
