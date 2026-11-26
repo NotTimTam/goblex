@@ -1,8 +1,5 @@
 /* Landing page */
 
-body:has(main.screen) {
-}
-
 main.screen {
   display: flex;
   flex-direction: column;
