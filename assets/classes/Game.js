@@ -356,11 +356,17 @@ export default class Game {
         { passive: false },
       );
 
-      for (const [i, level] of Object.entries(packData.data)) {
+      const entries = Object.entries(packData.data);
+
+      for (const index in entries) {
+        const [i, level] = entries[index];
+
         const levelButton = document.createElement("button");
 
         const levelUnlocked =
-          +i === 0 || (packSave[+i - 1] && packSave[+i - 1].w);
+          packData.hidden ||
+          +index === 0 ||
+          (packSave[+i - 1] && packSave[+i - 1].w);
         const levelCompleted = packSave && packSave[+i]?.w;
 
         levelButton.className = "level default";
