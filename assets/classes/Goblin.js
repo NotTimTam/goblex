@@ -59,58 +59,50 @@ export default class Goblin extends Creature {
         }),
       );
 
-    const abilities = this.config.abilities;
+    if (this.config.movement) {
+      const targets = this.board.animals
+        .filter((a) => !a.dead)
+        .sort(
+          (a, b) =>
+            this.board.distance(this.i, a.i, "chebyshev") -
+            this.board.distance(this.i, b.i, "chebyshev"),
+        );
 
-    if (abilities)
-      abilities.forEach((ability) => {
-        switch (ability) {
-          case "chase":
-            const targets = this.board.animals
-              .filter((a) => !a.dead)
-              .sort(
-                (a, b) =>
-                  this.board.distance(this.i, a.i, "chebyshev") -
-                  this.board.distance(this.i, b.i, "chebyshev"),
-              );
+      if (
+        !targets.length ||
+        this.board.distance(this.i, targets[0].i, "chebyshev") <= 1
+      )
+        return;
 
-            if (
-              !targets.length ||
-              this.board.distance(this.i, targets[0].i, "chebyshev") <= 1
-            )
-              return;
+      const path = findPath(
+        this.board.toXY(this.i),
+        this.board.toXY(targets[0].i),
+        [
+          ...this.board.creatures
+            .filter((c) => c !== this && c !== targets[0])
+            .map((c) => this.board.toXY(c.i)),
+          ...this.board.exits.map((i) => this.board.toXY(i)),
+          ...this.board.walls.map((i) => this.board.toXY(i)),
+        ],
+        this.board.width,
+        this.board.height,
+      );
 
-            const path = findPath(
-              this.board.toXY(this.i),
-              this.board.toXY(targets[0].i),
-              [
-                ...this.board.creatures
-                  .filter((c) => c !== this && c !== targets[0])
-                  .map((c) => this.board.toXY(c.i)),
-                ...this.board.exits.map((i) => this.board.toXY(i)),
-                ...this.board.walls.map((i) => this.board.toXY(i)),
-              ],
-              this.board.width,
-              this.board.height,
-            );
-
-            if (path)
-              possibleMoves.push({
-                goblin: this,
-                move: "chase",
-                target: this.board.toIndex(...path[0]),
-                targetType: targets[0].type,
-              });
-
-            break;
-          default:
-            break;
-        }
-      });
+      if (path)
+        possibleMoves.push({
+          goblin: this,
+          move: "chase",
+          path,
+          targetType: targets[0].type,
+        });
+    }
 
     return possibleMoves;
   }
 
-  async move({ move, target, targetType }) {
+  async move(data) {
+    const { move, target } = data;
+
     if (move === "attack") {
       target.health -= this.attack;
 
@@ -124,7 +116,27 @@ export default class Goblin extends Creature {
         this.lastKill = true;
       }
     } else if (move === "chase") {
-      await this.board.moveCreature(this, target);
+      const { path, targetType } = data;
+      const subPath = path.slice(0, this.config.movement);
+
+      if (this.board.delayGoblinTurn) {
+        for (let i = 0; i < subPath.length; i++) {
+          if (i > 0) {
+            await new Promise((resolve) => setTimeout(resolve, 250));
+          }
+
+          await this.board.moveCreature(
+            this,
+            this.board.toIndex(...subPath[i]),
+          );
+        }
+      } else if (subPath.length) {
+        await this.board.moveCreature(
+          this,
+          this.board.toIndex(...subPath[subPath.length - 1]),
+        );
+      }
+
       this.board.logs.push(
         `${capitalizeWords(this.type)} moves towards a ${targetType}`,
       );

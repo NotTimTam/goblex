@@ -306,7 +306,7 @@ export default class Board {
     return board;
   }
 
-  goblinTurn() {
+  async goblinTurn() {
     const possibleMoves = [];
 
     // Gather moves.
@@ -429,7 +429,7 @@ export default class Board {
 
       const idealMove = possibleMoves.sort((a, b) => b.utility - a.utility)[0];
 
-      idealMove.goblin.move(idealMove);
+      await idealMove.goblin.move(idealMove);
 
       this.turn = "player";
     }
