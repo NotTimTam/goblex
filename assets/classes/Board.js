@@ -101,7 +101,10 @@ export default class Board {
     this.__lastClick = null;
     this.__rawTurn = t;
     if (this.endTurnButton) this.endTurnButton.remove();
-    if (this.turnData && this.turnData.clearAttack) this.turnData.clearAttack();
+    if (this.turnData) {
+      if (this.turnData.clearMove) this.turnData.clearMove();
+      if (this.turnData.clearAttack) this.turnData.clearAttack();
+    }
     document.activeElement.blur();
 
     this.animateCreatures();
@@ -476,10 +479,30 @@ export default class Board {
 
     const creature = this.getCreature(i);
 
+    const setupMove = (creature) => {
+      if (this.turnData.moved) return;
+      this.turnData.clearMove?.();
+
+      const moves = creature.getPossibleMoves();
+      const selectedElement = creature.element;
+
+      const clearMove = () => {
+        moves.forEach((tile) => {
+          this.getTile(tile).classList.remove("moveable");
+          selectedElement.removeEventListener("blur", clearMove);
+        });
+      };
+
+      moves.forEach((tile) => {
+        this.getTile(tile).classList.toggle("moveable", true);
+      });
+
+      this.turnData.clearMove = clearMove;
+      selectedElement.addEventListener("blur", clearMove);
+    };
+
     const setupAttack = (creature) => {
       this.turnData.clearAttack?.();
-
-      this.turnData.selectedAnimal = creature;
 
       const possibleEnemies = creature.neighbors.filter(
         (c) => c.creatureType === "goblin" && !c.dead,
@@ -504,6 +527,7 @@ export default class Board {
       };
 
       const keepFocus = (event) => {
+        console.log("KEEPING FOCUS");
         const isAttackTarget =
           event.relatedTarget?.classList.contains("attackable");
 
@@ -544,19 +568,15 @@ export default class Board {
         !lastClick.dead &&
         !this.turnData.moved
       ) {
-        const dt = this.distance(lastClick.i, i, "chebyshev");
+        const moveable = lastClick.getPossibleMoves().includes(i);
 
-        if (dt < 2) {
-          if (this.walls.includes(i)) {
-            this.logs.push("This is a wall...");
-            return lastClick.element.focus();
-          }
-
+        if (moveable) {
           // Move the animal.
           this.logs.push(
             `Moved ${lastClick.type} to (${this.toXY(lastClick.i).join(", ")})`,
           );
           this.turnData.clearAttack?.();
+          this.turnData.clearMove?.();
           lastClick.i = i;
           this.turnData.moved = true;
 
@@ -576,14 +596,16 @@ export default class Board {
 
           setupAttack(lastClick);
         } else {
-          this.logs.push("Tile too far...");
-          return lastClick.element.focus();
+          this.logs.push("Tile unreachable...");
+          return;
         }
       }
     } else {
       // Tile is not empty.
       if (creature.creatureType === "animal" && !creature.dead) {
         // Handle animal click.
+        this.turnData.selectedAnimal = creature;
+        setupMove(creature);
         setupAttack(creature);
       } else if (
         this.turnData.selectedAnimal &&
