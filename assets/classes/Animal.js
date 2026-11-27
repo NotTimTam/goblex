@@ -67,6 +67,9 @@ export default class Animal extends Creature {
 
         const i = this.board.toIndex(x, y);
 
+        // Walls and creatures cannot be moved past.
+        if (this.board.getCreature(i) || this.board.walls.includes(i)) break;
+
         possibleMoves.push(i);
       }
     }
