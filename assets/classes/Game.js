@@ -202,7 +202,10 @@ export default class Game {
   }
 
   loadMenu() {
-    this.board = null;
+    if (this.board) {
+      this.board.cleanup();
+      this.board = null;
+    }
 
     document.body.innerHTML = `<main class="screen">
         <header>
