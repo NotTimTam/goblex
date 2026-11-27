@@ -35,7 +35,7 @@ export default class Board {
     this.gameElement = document.querySelector("main.game");
     this.turnDisplay = this.gameElement.querySelector("p.turn-display");
     this.board = this.gameElement.querySelector("div.board");
-    this.boardWidth = width;
+    this.width = width;
 
     this.calculateMaxTileSize();
     this.rerenderListener = window.addEventListener("resize", () => {
@@ -73,10 +73,14 @@ export default class Board {
       "--max-tile-width",
       `${
         (this.gameElement.getBoundingClientRect().width -
-          (this.boardWidth - 1) * this.tileGap) /
-        this.boardWidth
+          (this.width - 1) * this.tileGap) /
+        this.width
       }px`,
     );
+  }
+
+  get height() {
+    return Math.floor(this.size / this.width);
   }
 
   get points() {
@@ -208,8 +212,8 @@ export default class Board {
     return false;
   }
 
-  toIndex = (x, y) => y * this.boardWidth + x;
-  toXY = (i) => [i % this.boardWidth, Math.floor(i / this.boardWidth)];
+  toIndex = (x, y) => y * this.width + x;
+  toXY = (i) => [i % this.width, Math.floor(i / this.width)];
   /**
    * Distance between two board indices.
    *
@@ -488,13 +492,20 @@ export default class Board {
 
       const clearMove = () => {
         moves.forEach((tile) => {
-          this.getTile(tile).classList.remove("moveable");
+          const element = this.getTile(tile);
+          element.classList.remove("moveable");
+          element.style.setProperty("--delay", null);
           selectedElement.removeEventListener("blur", clearMove);
         });
       };
 
       moves.forEach((tile) => {
-        this.getTile(tile).classList.toggle("moveable", true);
+        const element = this.getTile(tile);
+        element.classList.toggle("moveable", true);
+
+        const distance = this.distance(creature.i, tile, "chebyshev");
+
+        element.style.setProperty("--delay", `${distance * 100}ms`);
       });
 
       this.turnData.clearMove = clearMove;
@@ -527,7 +538,6 @@ export default class Board {
       };
 
       const keepFocus = (event) => {
-        console.log("KEEPING FOCUS");
         const isAttackTarget =
           event.relatedTarget?.classList.contains("attackable");
 
@@ -679,9 +689,7 @@ export default class Board {
     const { level, size } = this;
 
     // Create elements.
-    this.board.style.gridTemplateColumns = "1fr "
-      .repeat(this.boardWidth)
-      .trim();
+    this.board.style.gridTemplateColumns = "1fr ".repeat(this.width).trim();
     this.board.innerHTML = null;
 
     for (let i = 0; i < size; i++) {

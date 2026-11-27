@@ -44,6 +44,8 @@ export default class Animal extends Creature {
       dir: [xDir, yDir],
       config,
     } of moves) {
+      if (!config) continue; // Skip moves this animal can't make.
+
       const maxX = xDir < 0 ? curX : xDir > 0 ? this.board.width - 1 - curX : 0;
       const maxY =
         yDir < 0 ? curY : yDir > 0 ? this.board.height - 1 - curY : 0;

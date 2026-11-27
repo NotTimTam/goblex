@@ -116,11 +116,58 @@ div.board button.tile.dead {
 div.board[turn="player"] button.tile.moveable:not(.exit) {
   --accent: dodgerblue;
   background-color: #1e8fff42;
+  animation: indicate-moveable 1s ease;
+  animation-delay: var(--delay, 0);
+  animation-fill-mode: both;
+}
+
+@keyframes indicate-moveable {
+  0% {
+    translate: unset;
+    border-color: #fff;
+    background-color: #000;
+  }
+
+  50% {
+    translate: 0 -5px;
+    border-color: dodgerblue;
+    background-color: #1e8fff42;
+  }
+
+  100% {
+    translate: unset;
+    border-color: dodgerblue;
+    background-color: #1e8fff42;
+  }
 }
 
 div.board[turn="player"] button.tile.moveable.exit {
-  border-color: dodgerblue;
-  border-width: 4px;
+  --accent: dodgerblue;
+
+  animation: indicate-moveable-exit 1s ease;
+  animation-delay: var(--delay, 0);
+  animation-fill-mode: both;
+}
+
+@keyframes indicate-moveable-exit {
+  0% {
+    translate: unset;
+    border-color: #559955;
+    background-color: #5599553c;
+  }
+
+  50% {
+    translate: 0 -5px;
+    border-color: dodgerblue;
+    background-color: #1e8fff42;
+  }
+
+  100% {
+    translate: unset;
+    rotate: 0deg;
+    border-color: dodgerblue;
+    background-color: #5599553c;
+  }
 }
 
 div.board[turn="player"] button.tile.attackable:not(.dead) {

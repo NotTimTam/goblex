@@ -89,8 +89,8 @@ export default class Goblin extends Creature {
                 ...this.board.exits.map((i) => this.board.toXY(i)),
                 ...this.board.walls.map((i) => this.board.toXY(i)),
               ],
-              this.board.boardWidth,
-              Math.floor(this.board.level.length / this.board.boardWidth),
+              this.board.width,
+              this.board.height,
             );
 
             if (path)
