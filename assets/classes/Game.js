@@ -202,7 +202,7 @@ export default class Game {
   }
 
   loadMenu() {
-    if (this.board && !this.board.endCondition) return;
+    this.board = null;
 
     document.body.innerHTML = `<main class="screen">
         <header>
