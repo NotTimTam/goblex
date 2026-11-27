@@ -273,7 +273,7 @@ export default class Board {
       return Promise.resolve();
     }
 
-    document.startViewTransition(updatePosition).updateCallbackDone;
+    return document.startViewTransition(updatePosition).updateCallbackDone;
   }
 
   goblin(i, type) {
