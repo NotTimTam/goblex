@@ -10,6 +10,6 @@ console.log(
 
 const game = new Game();
 
-game.currentSlot = 0;
-game.save = JSON.parse(localStorage.getItem("goblex_slot_1"));
-game.screen = { name: "level", level: ["dev", 103] };
+// game.currentSlot = 0;
+// game.save = JSON.parse(localStorage.getItem("goblex_slot_1"));
+// game.screen = { name: "level", level: ["base", 2] };
