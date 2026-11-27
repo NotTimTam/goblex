@@ -13,6 +13,10 @@ export default class Animal extends Creature {
     this.attack = this.config.attack;
   }
 
+  get attackableEnemies() {
+    return this.neighbors.filter((c) => c.creatureType === "goblin" && !c.dead);
+  }
+
   get config() {
     return animals[this.type];
   }

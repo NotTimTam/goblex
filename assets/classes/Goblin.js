@@ -110,7 +110,7 @@ export default class Goblin extends Creature {
     return possibleMoves;
   }
 
-  move({ move, target, targetType }) {
+  async move({ move, target, targetType }) {
     if (move === "attack") {
       target.health -= this.attack;
 
@@ -124,7 +124,7 @@ export default class Goblin extends Creature {
         this.lastKill = true;
       }
     } else if (move === "chase") {
-      this.board.moveCreature(this, target);
+      await this.board.moveCreature(this, target);
       this.board.logs.push(
         `${capitalizeWords(this.type)} moves towards a ${targetType}`,
       );

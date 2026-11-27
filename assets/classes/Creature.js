@@ -90,6 +90,7 @@ export default class Creature {
         const hb = healthbar();
 
         this.element.appendChild(hb);
+        hb.style.viewTransitionName = `creature-hb-${this.id}`;
 
         return hb;
       })()
@@ -107,7 +108,7 @@ export default class Creature {
     const sprite = document.createElement("span");
     sprite.className = "sprite";
     sprite.style.backgroundImage = `url("${url}")`;
-    sprite.style.viewTransitionName = `creature-${this.id}`;
+    sprite.style.viewTransitionName = `creature-sprite-${this.id}`;
     this.element.appendChild(sprite);
 
     this.genericAnimate();

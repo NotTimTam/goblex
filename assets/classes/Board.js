@@ -264,14 +264,16 @@ export default class Board {
   moveCreature(creature, destination) {
     const updatePosition = () => {
       creature.i = destination;
+
+      if (this.turnData?.clearAttack) this.turnData.clearAttack();
     };
 
     if (!document.startViewTransition) {
       updatePosition();
-      return;
+      return Promise.resolve();
     }
 
-    document.startViewTransition(updatePosition);
+    document.startViewTransition(updatePosition).updateCallbackDone;
   }
 
   goblin(i, type) {
@@ -488,7 +490,7 @@ export default class Board {
     this.turn = result === "win" ? "player" : "goblin";
   }
 
-  click(i) {
+  async click(i) {
     if (this.turn !== "player") return;
 
     const lastClick =
@@ -528,9 +530,7 @@ export default class Board {
     const setupAttack = (creature) => {
       this.turnData.clearAttack?.();
 
-      const possibleEnemies = creature.neighbors.filter(
-        (c) => c.creatureType === "goblin" && !c.dead,
-      );
+      const possibleEnemies = creature.attackableEnemies;
 
       const possibleAllies = creature.neighbors.filter(
         (c) => c.creatureType === "animal" && !c.dead,
@@ -600,8 +600,8 @@ export default class Board {
           );
           this.turnData.clearAttack?.();
           this.turnData.clearMove?.();
-          this.moveCreature(lastClick, i);
           this.turnData.moved = true;
+          await this.moveCreature(lastClick, i);
 
           // Check if the player moved to an exit. If so end their turn.
           if (this.exits.includes(i)) {
@@ -632,7 +632,7 @@ export default class Board {
         setupAttack(creature);
       } else if (
         this.turnData.selectedAnimal &&
-        creature.element.classList.contains("attackable") &&
+        this.turnData.selectedAnimal.attackableEnemies.includes(creature) &&
         !creature.dead
       ) {
         this.triggerAttack(this.turnData.selectedAnimal, creature);
