@@ -93,7 +93,7 @@ export default class Goblin extends Creature {
             goblin: this,
             move: "chase",
             path,
-            targetType: targets[0].type,
+            target: targets[0],
           });
       }
     }
@@ -102,10 +102,10 @@ export default class Goblin extends Creature {
   }
 
   async move(data) {
-    const { move } = data;
+    const { move, target } = data;
 
     if (move === "attack") {
-      const { fromMove, target } = data;
+      const { fromMove } = data;
 
       target.health -= this.attack;
 
@@ -119,11 +119,11 @@ export default class Goblin extends Creature {
         this.lastKill = true;
       }
     } else if (move === "chase") {
-      const { path, targetType } = data;
+      const { path } = data;
       const subPath = path.slice(0, this.config.movement);
 
       this.board.logs.push(
-        `A goblin ${this.type} is moving towards a ${targetType}`,
+        `A goblin ${this.type} is moving towards a ${target.type}`,
       );
 
       if (this.board.delayGoblinTurn) {

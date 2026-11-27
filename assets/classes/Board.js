@@ -298,8 +298,8 @@ export default class Board {
     this.exits.forEach((exit) => (board[exit] = 1));
     this.walls.forEach((wall) => (board[wall] = 2));
     this.creatures.forEach(
-      ({ i, creatureType, type, health, maxHealth, dead, attack }) => {
-        board[i] = { creatureType, type, health, maxHealth, dead, attack };
+      ({ i, creatureType, type, health, maxHealth, dead, attack, id }) => {
+        board[i] = { creatureType, type, health, maxHealth, dead, attack, id };
       },
     );
 
@@ -393,26 +393,67 @@ export default class Board {
         );
       };
 
+      const calculateNeighbors = (i, board) => {
+        const col = i % this.width;
+        const offsets = [
+          -this.width - 1,
+          -this.width,
+          -this.width + 1,
+          -1,
+          1,
+          this.width - 1,
+          this.width,
+          this.width + 1,
+        ];
+
+        const indices = offsets
+          .map((offset) => i + offset)
+          .filter(
+            (j) =>
+              j >= 0 &&
+              j < board.length &&
+              j !== i &&
+              Math.abs((j % this.width) - col) <= 1,
+          );
+
+        return indices
+          .map((j) => [j, board[j]])
+          .filter(([_, value]) => value && typeof value === "object")
+          .map(([i, value]) => ({ ...value, i }));
+      };
+
       const calculateMoveOutcome = (move) => {
         const outcome = JSON.parse(JSON.stringify(currentBoard));
 
-        switch (move.move) {
-          case "attack":
-            const target = outcome[move.target.i];
-            outcome[move.target.i] = {
-              ...target,
-              health: Math.max(target.health - move.goblin.attack, 0),
-              dead: target.health - move.goblin.attack <= 0,
+        if (move.move === "attack") {
+          const target = outcome[move.target.i];
+          outcome[move.target.i] = {
+            ...target,
+            health: Math.max(target.health - move.goblin.attack, 0),
+            dead: target.health - move.goblin.attack <= 0,
+          };
+        } else if (move.move === "chase") {
+          const subPath = move.path.slice(0, move.goblin.config.movement);
+          const target = this.toIndex(...subPath[subPath.length - 1]);
+
+          const adjacentAnimals = calculateNeighbors(target, outcome).filter(
+            (a) => a.creatureType === "animal",
+          );
+
+          const reachedTarget = adjacentAnimals.find(
+            (a) => a.id === move.target.id,
+          );
+
+          outcome[target] = outcome[move.goblin.i];
+          outcome[move.goblin.i] = 0;
+
+          if (reachedTarget) {
+            outcome[reachedTarget.i] = {
+              ...reachedTarget,
+              health: Math.max(reachedTarget.health - move.goblin.attack, 0),
+              dead: reachedTarget.health - move.goblin.attack <= 0,
             };
-            break;
-
-          case "chase":
-            outcome[move.target] = outcome[move.goblin.i];
-            outcome[move.goblin.i] = 0;
-            break;
-
-          default:
-            break;
+          }
         }
 
         return outcome;

@@ -414,15 +414,15 @@ export const goblins = {
   shaman: { health: 20, attack: 5, color: "#4e8f6b", movement: 0 },
   bandit: {
     health: 1,
-    attack: 50,
+    attack: 25,
     color: "#6aa84f",
-    movement: 50,
+    movement: 5,
   },
   assassin: {
     health: 1,
-    attack: 999,
+    attack: 50,
     color: "#1f1f2b",
-    movement: 50,
+    movement: 5,
   },
   miner: {
     health: 15,
