@@ -62,23 +62,32 @@ div.board button.tile {
   height: var(--size);
   max-width: var(--max-tile-width);
   max-height: var(--max-tile-width);
-  background-repeat: no-repeat;
 
   image-rendering: pixelated;
 
   position: relative;
-
-  background-color: #000;
 }
 
-div.board button.tile[type="animal"] {
+div.board button.tile span.sprite {
+  position: absolute;
+  inset: 0;
+  background-repeat: no-repeat;
+  pointer-events: none;
+}
+
+div.board button.tile[type="animal"] span.sprite {
   background-size: 400% 100%;
   background-position: calc(var(--frame, 0) / 3 * 100%) 0;
 }
 
-div.board button.tile[type="goblin"] {
+div.board button.tile[type="goblin"] span.sprite {
   background-size: 500% 100%;
   background-position: calc(var(--frame, 0) / 4 * 100%) 0;
+}
+
+::view-transition-group(*) {
+  animation-duration: 220ms;
+  animation-timing-function: ease-in-out;
 }
 
 div.board[turn="player"] button.tile:hover[type]:not(.dead) {
@@ -282,7 +291,7 @@ div.fight {
   position: absolute;
   border: 1px solid #fff;
 
-  z-index: 2;
+  z-index: 99;
 
   max-width: 100%;
   max-height: 100%;
@@ -564,6 +573,8 @@ div.healthbar {
   height: 4px;
 
   background-color: #ffffff2c;
+
+  z-index: 4;
 }
 
 div.healthbar span.inner {

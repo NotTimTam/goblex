@@ -261,6 +261,21 @@ export default class Board {
     return this.creatures.find((x) => x.i === i);
   }
 
+  moveCreature(creature, destination) {
+    const updatePosition = () => {
+      creature.i = destination;
+
+      if (this.turnData?.clearAttack) this.turnData.clearAttack();
+    };
+
+    if (!document.startViewTransition) {
+      updatePosition();
+      return Promise.resolve();
+    }
+
+    return document.startViewTransition(updatePosition).updateCallbackDone;
+  }
+
   goblin(i, type) {
     const creature = new Goblin(this, i, type);
 
@@ -291,7 +306,7 @@ export default class Board {
     return board;
   }
 
-  goblinTurn() {
+  async goblinTurn() {
     const possibleMoves = [];
 
     // Gather moves.
@@ -414,7 +429,7 @@ export default class Board {
 
       const idealMove = possibleMoves.sort((a, b) => b.utility - a.utility)[0];
 
-      idealMove.goblin.move(idealMove);
+      await idealMove.goblin.move(idealMove);
 
       this.turn = "player";
     }
@@ -475,7 +490,7 @@ export default class Board {
     this.turn = result === "win" ? "player" : "goblin";
   }
 
-  click(i) {
+  async click(i) {
     if (this.turn !== "player") return;
 
     const lastClick =
@@ -515,9 +530,7 @@ export default class Board {
     const setupAttack = (creature) => {
       this.turnData.clearAttack?.();
 
-      const possibleEnemies = creature.neighbors.filter(
-        (c) => c.creatureType === "goblin" && !c.dead,
-      );
+      const possibleEnemies = creature.attackableEnemies;
 
       const possibleAllies = creature.neighbors.filter(
         (c) => c.creatureType === "animal" && !c.dead,
@@ -587,8 +600,8 @@ export default class Board {
           );
           this.turnData.clearAttack?.();
           this.turnData.clearMove?.();
-          lastClick.i = i;
           this.turnData.moved = true;
+          await this.moveCreature(lastClick, i);
 
           // Check if the player moved to an exit. If so end their turn.
           if (this.exits.includes(i)) {
@@ -619,7 +632,7 @@ export default class Board {
         setupAttack(creature);
       } else if (
         this.turnData.selectedAnimal &&
-        creature.element.classList.contains("attackable") &&
+        this.turnData.selectedAnimal.attackableEnemies.includes(creature) &&
         !creature.dead
       ) {
         this.triggerAttack(this.turnData.selectedAnimal, creature);
