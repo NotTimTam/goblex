@@ -261,6 +261,19 @@ export default class Board {
     return this.creatures.find((x) => x.i === i);
   }
 
+  moveCreature(creature, destination) {
+    const updatePosition = () => {
+      creature.i = destination;
+    };
+
+    if (!document.startViewTransition) {
+      updatePosition();
+      return;
+    }
+
+    document.startViewTransition(updatePosition);
+  }
+
   goblin(i, type) {
     const creature = new Goblin(this, i, type);
 
@@ -587,7 +600,7 @@ export default class Board {
           );
           this.turnData.clearAttack?.();
           this.turnData.clearMove?.();
-          lastClick.i = i;
+          this.moveCreature(lastClick, i);
           this.turnData.moved = true;
 
           // Check if the player moved to an exit. If so end their turn.

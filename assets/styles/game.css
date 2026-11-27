@@ -62,21 +62,32 @@ div.board button.tile {
   height: var(--size);
   max-width: var(--max-tile-width);
   max-height: var(--max-tile-width);
-  background-repeat: no-repeat;
 
   image-rendering: pixelated;
 
   position: relative;
 }
 
-div.board button.tile[type="animal"] {
+div.board button.tile span.sprite {
+  position: absolute;
+  inset: 0;
+  background-repeat: no-repeat;
+  pointer-events: none;
+}
+
+div.board button.tile[type="animal"] span.sprite {
   background-size: 400% 100%;
   background-position: calc(var(--frame, 0) / 3 * 100%) 0;
 }
 
-div.board button.tile[type="goblin"] {
+div.board button.tile[type="goblin"] span.sprite {
   background-size: 500% 100%;
   background-position: calc(var(--frame, 0) / 4 * 100%) 0;
+}
+
+::view-transition-group(*) {
+  animation-duration: 220ms;
+  animation-timing-function: ease-in-out;
 }
 
 div.board[turn="player"] button.tile:hover[type]:not(.dead) {

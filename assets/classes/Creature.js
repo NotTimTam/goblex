@@ -1,7 +1,10 @@
 import { healthbar } from "../util/creatures.js";
 
+let nextCreatureId = 0;
+
 export default class Creature {
   constructor(board, i, creatureType, type) {
+    this.id = ++nextCreatureId;
     this.board = board;
     this.creatureType = creatureType;
     this.type = type;
@@ -100,8 +103,12 @@ export default class Creature {
     );
 
     this.element.setAttribute("type", this.creatureType);
-    this.element.setAttribute("url", url);
-    this.element.style.backgroundImage = `url("${url}")`;
+
+    const sprite = document.createElement("span");
+    sprite.className = "sprite";
+    sprite.style.backgroundImage = `url("${url}")`;
+    sprite.style.viewTransitionName = `creature-${this.id}`;
+    this.element.appendChild(sprite);
 
     this.genericAnimate();
   }

@@ -124,7 +124,7 @@ export default class Goblin extends Creature {
         this.lastKill = true;
       }
     } else if (move === "chase") {
-      this.i = target;
+      this.board.moveCreature(this, target);
       this.board.logs.push(
         `${capitalizeWords(this.type)} moves towards a ${targetType}`,
       );
