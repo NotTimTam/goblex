@@ -36,6 +36,10 @@ export default class Goblin extends Creature {
     } else this.frame = EMOTIONS.normal;
   }
 
+  get attackableAnimals() {
+    return this.neighbors.filter((n) => n.creatureType === "animal" && !n.dead);
+  }
+
   possibleMoves() {
     /*
     Goblin AI breakdown:
@@ -49,15 +53,13 @@ export default class Goblin extends Creature {
 
     const possibleMoves = [];
 
-    this.neighbors
-      .filter((n) => n.creatureType === "animal" && !n.dead)
-      .forEach((edible) =>
-        possibleMoves.push({
-          goblin: this,
-          move: "attack",
-          target: edible,
-        }),
-      );
+    this.attackableAnimals.forEach((edible) =>
+      possibleMoves.push({
+        goblin: this,
+        move: "attack",
+        target: edible,
+      }),
+    );
 
     if (this.config.movement) {
       const targets = this.board.animals
@@ -135,6 +137,13 @@ export default class Goblin extends Creature {
           this,
           this.board.toIndex(...subPath[subPath.length - 1]),
         );
+      }
+
+      // Attack after a move if possible
+      if (this.attackableAnimals.length) {
+        if (this.board.delayGoblinTurn)
+          await new Promise((resolve) => setTimeout(resolve, 500));
+        await this.move({ move: "attack", target: this.attackableAnimals[0] });
       }
 
       this.board.logs.push(
