@@ -46,17 +46,13 @@ export default class Animal extends Creature {
     } of moves) {
       if (!config) continue; // Skip moves this animal can't make.
 
-      const maxX = xDir < 0 ? curX : xDir > 0 ? this.board.width - 1 - curX : 0;
-      const maxY =
-        yDir < 0 ? curY : yDir > 0 ? this.board.height - 1 - curY : 0;
-
-      const maxDistance = Math.max(maxX, maxY);
+      const maxDistance = typeof config === "number" ? config : config.length;
 
       for (let distance = 1; distance <= maxDistance; distance++) {
         const x = curX + xDir * distance;
         const y = curY + yDir * distance;
 
-        // Stop when this direction reaches the edge of the board
+        // Stop when this direction reaches the edge of the board.
         if (
           x < 0 ||
           x > this.board.width - 1 ||
@@ -69,6 +65,9 @@ export default class Animal extends Creature {
 
         // Walls and creatures cannot be moved past.
         if (this.board.getCreature(i) || this.board.walls.includes(i)) break;
+
+        // Skip when config blocks specific tile.
+        if (Array.isArray(config) && !config[distance - 1]) continue;
 
         possibleMoves.push(i);
       }
