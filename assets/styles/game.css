@@ -67,8 +67,6 @@ div.board button.tile {
   image-rendering: pixelated;
 
   position: relative;
-
-  background-color: #000;
 }
 
 div.board button.tile[type="animal"] {
@@ -564,6 +562,8 @@ div.healthbar {
   height: 4px;
 
   background-color: #ffffff2c;
+
+  z-index: 4;
 }
 
 div.healthbar span.inner {
