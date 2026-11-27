@@ -2,7 +2,6 @@
 
 # To-do
 
-- Advanced goblin movement system
 - Advanced fight system
 - Items
 - Settings menu
