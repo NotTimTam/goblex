@@ -6,13 +6,19 @@ export default class Animal extends Creature {
     if (!(type in animals))
       throw new Error(`No animals exists with type "${type}"`);
 
-    const config = animals[type];
-
     super(board, i, "animal", type);
 
-    this.health = config.health;
-    this.maxHealth = config.health;
-    this.attack = config.attack;
+    this.health = this.config.health;
+    this.maxHealth = this.config.health;
+    this.attack = this.config.attack;
+  }
+
+  get config() {
+    return animals[this.type];
+  }
+
+  getPossibleMoves() {
+    return this.config.movement;
   }
 
   exit() {

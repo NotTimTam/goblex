@@ -9,13 +9,15 @@ export default class Goblin extends Creature {
     if (!(type in goblins))
       throw new Error(`No goblins exists with type "${type}"`);
 
-    const config = goblins[type];
-
     super(board, i, "goblin", type);
 
-    this.health = config.health;
-    this.maxHealth = config.health;
-    this.attack = config.attack;
+    this.health = this.config.health;
+    this.maxHealth = this.config.health;
+    this.attack = this.config.attack;
+  }
+
+  get config() {
+    return goblins[this.type];
   }
 
   animate() {
@@ -57,7 +59,7 @@ export default class Goblin extends Creature {
         }),
       );
 
-    const abilities = goblins[this.type].abilities;
+    const abilities = this.config.abilities;
 
     if (abilities)
       abilities.forEach((ability) => {
