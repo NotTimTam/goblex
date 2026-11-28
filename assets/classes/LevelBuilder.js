@@ -16,8 +16,8 @@ export default class LevelBuilder {
 
   set size(n) {
     this.__rawSize = [
-      Math.max(0, Math.min(n[0], 24)),
-      Math.max(0, Math.min(n[1], 24)),
+      Math.max(1, Math.min(n[0] ?? 1, 24)),
+      Math.max(1, Math.min(n[1] ?? 1, 24)),
     ];
     this.canvas.style.gridTemplateColumns = `repeat(${this.__rawSize[0]}, 1fr)`;
     this.canvas.style.gridTemplateRows = `repeat(${this.__rawSize[1]}, 1fr)`;
@@ -117,6 +117,57 @@ export default class LevelBuilder {
     canvasContainer.className = "canvas-container";
     document.body.children[0].appendChild(canvasContainer);
 
+    const canvasWrapper = document.createElement("div");
+    canvasWrapper.className = "canvas-wrapper";
+    canvasWrapper.style.setProperty("--scale", 1.5);
+    canvasContainer.appendChild(canvasWrapper);
+
+    canvasContainer.onwheel = (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+
+      const oldScale =
+        Number(canvasWrapper.style.getPropertyValue("--scale")) || 1;
+      const rect = canvasContainer.getBoundingClientRect();
+      const pointerX = e.clientX - rect.left;
+      const pointerY = e.clientY - rect.top;
+      const anchorX =
+        (canvasContainer.scrollLeft +
+          pointerX -
+          canvasWrapper.offsetWidth / 2) /
+        oldScale;
+      const anchorY =
+        (canvasContainer.scrollTop +
+          pointerY -
+          canvasWrapper.offsetHeight / 2) /
+        oldScale;
+
+      const dir = e.wheelDelta > 0 ? 1 : -1;
+      const newScale = Math.max(0.5, Math.min(4, oldScale + dir * 0.1));
+      canvasWrapper.style.setProperty("--scale", newScale);
+
+      updateStage(() => {
+        const maxX = canvasContainer.scrollWidth - canvasContainer.clientWidth;
+        const maxY =
+          canvasContainer.scrollHeight - canvasContainer.clientHeight;
+
+        canvasContainer.scrollLeft = Math.max(
+          0,
+          Math.min(
+            maxX,
+            canvasWrapper.offsetWidth / 2 + anchorX * newScale - pointerX,
+          ),
+        );
+        canvasContainer.scrollTop = Math.max(
+          0,
+          Math.min(
+            maxY,
+            canvasWrapper.offsetHeight / 2 + anchorY * newScale - pointerY,
+          ),
+        );
+      });
+    };
+
     canvasContainer.oncontextmenu = (e) => {
       e.preventDefault();
       e.stopPropagation();
@@ -129,32 +180,56 @@ export default class LevelBuilder {
 
     canvasContainer.onmousedown = (e) => {
       this.btns[e.button] = true;
+
+      if (e.button === 1) {
+        e.preventDefault();
+        this.dragging = [
+          e.clientX,
+          e.clientY,
+          canvasContainer.scrollLeft,
+          canvasContainer.scrollTop,
+        ];
+      }
     };
 
     canvasContainer.onmouseup = (e) => {
       this.btns[e.button] = false;
+
+      if (e.button === 1) this.dragging = null;
+    };
+
+    canvasContainer.onmousemove = (e) => {
+      if (!this.btns[1] || !this.dragging) return;
+
+      const [startX, startY, scrollLeft, scrollTop] = this.dragging;
+      canvasContainer.scrollLeft = scrollLeft - (e.clientX - startX);
+      canvasContainer.scrollTop = scrollTop - (e.clientY - startY);
     };
 
     this.canvas = document.createElement("div");
     this.canvas.className = "canvas";
-    this.canvas.style.setProperty("--scale", 1.5);
-    this.canvas.style.setProperty("--transform-x", 0.5);
-    this.canvas.style.setProperty("--transform-y", 0.5);
-    canvasContainer.appendChild(this.canvas);
-    canvasContainer.onwheel = (e) => {
-      const dir = e.wheelDelta > 0 ? 1 : -1;
 
-      this.canvas.style.setProperty(
-        "--scale",
-        Math.max(
-          0.5,
-          Math.min(
-            4,
-            +(this.canvas.style.getPropertyValue("--scale") || 1) + dir * 0.1,
-          ),
-        ),
-      );
+    // Populate
+    this.size = [7, 7];
+
+    canvasWrapper.appendChild(this.canvas);
+
+    const gutter = 512;
+
+    const updateStage = (afterLayout) => {
+      const scale =
+        Number(canvasWrapper.style.getPropertyValue("--scale")) || 1;
+
+      canvasWrapper.style.width = `${Math.max(canvasContainer.clientWidth, this.canvas.offsetWidth * scale + gutter * 2)}px`;
+      canvasWrapper.style.height = `${Math.max(canvasContainer.clientHeight, this.canvas.offsetHeight * scale + gutter * 2)}px`;
+
+      requestAnimationFrame(() => {
+        if (afterLayout) afterLayout();
+      });
     };
+
+    updateStage();
+    window.addEventListener("resize", updateStage);
 
     // Create context menu
     this.contextMenu = document.createElement("header");
@@ -240,9 +315,6 @@ export default class LevelBuilder {
     this.tooltip = document.createElement("p");
     this.tooltip.className = "tooltip";
     document.body.children[0].appendChild(this.tooltip);
-
-    // Populate
-    this.size = [7, 7];
   }
 
   rightClick(i) {
