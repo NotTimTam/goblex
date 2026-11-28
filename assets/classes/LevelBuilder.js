@@ -240,8 +240,15 @@ export default class LevelBuilder {
       });
     };
 
-    updateStage();
-    window.addEventListener("resize", updateStage);
+    const centerScroll = () => {
+      canvasContainer.scrollLeft =
+        (canvasContainer.scrollWidth - canvasContainer.clientWidth) / 2;
+      canvasContainer.scrollTop =
+        (canvasContainer.scrollHeight - canvasContainer.clientHeight) / 2;
+    };
+
+    updateStage(centerScroll);
+    window.addEventListener("resize", () => updateStage(centerScroll));
 
     // Create tooling
     this.toolbar = document.createElement("div");
