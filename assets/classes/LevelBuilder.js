@@ -109,6 +109,34 @@ export default class LevelBuilder {
     }
   }
 
+  openCreatures(creatureType, creatures, toolButton) {
+    const creaturePopup = document.createElement("div");
+    creaturePopup.className = "creatures";
+
+    this.toolbar.prepend(creaturePopup);
+
+    creaturePopup.innerHTML = null;
+
+    for (const [type, creature] of Object.entries(creatures)) {
+      const button = document.createElement("button");
+      button.className = `creature ${creatureType}`;
+      button.style.backgroundImage = `url(${new URL(
+        `assets/images/${creatureType}/${type}.png`,
+        document.baseURI,
+      )})`;
+      button.style.backgroundSize =
+        creatureType === "animals" ? "400%" : "500%";
+      button.onclick = () => {
+        this.currentTool = type;
+        toolButton.style.setProperty("--icon", button.style.backgroundImage);
+
+        creaturePopup.remove();
+      };
+
+      creaturePopup.appendChild(button);
+    }
+  }
+
   buildUI() {
     document.body.innerHTML = `<main class="level-builder"></main>`;
 
@@ -262,8 +290,10 @@ export default class LevelBuilder {
           document.baseURI,
         )}) `,
         backgroundSize: "400%",
-        activator: () => {
+        activator: (toolButton) => {
           this.currentTool = "mouse";
+
+          this.openCreatures("animals", animals, toolButton);
         },
       },
       {
@@ -272,8 +302,10 @@ export default class LevelBuilder {
           document.baseURI,
         )})`,
         backgroundSize: "500%",
-        activator: () => {
+        activator: (toolButton) => {
           this.currentTool = "grunt";
+
+          this.openCreatures("goblins", goblins, toolButton);
         },
       },
       {
@@ -308,10 +340,12 @@ export default class LevelBuilder {
         toolButton.style.backgroundSize = tool.backgroundSize;
       if (tool.border) toolButton.style.borderColor = tool.border;
       toolButton.onclick = () => {
-        tool.activator();
+        this.toolbar.querySelector("div.creatures")?.remove();
+
+        tool.activator(toolButton);
 
         this.toolbar
-          .querySelector("button.active")
+          .querySelector("button.tool.active")
           ?.classList.toggle("active", false);
         toolButton.classList.toggle("active", true);
       };

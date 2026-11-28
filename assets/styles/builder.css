@@ -73,6 +73,7 @@ main.level-builder div.canvas button.tile:hover {
   background-color: #151515;
 }
 
+/* Toolbar */
 main.level-builder div.toolbar {
   position: absolute;
   bottom: 0;
@@ -85,6 +86,41 @@ main.level-builder div.toolbar {
   transform: translateX(-50%);
 
   padding-bottom: 0.75rem;
+}
+
+main.level-builder div.toolbar div.creatures {
+  position: absolute;
+  bottom: 100%;
+  left: 0%;
+
+  width: 100%;
+
+  padding-bottom: 1.5rem;
+}
+
+main.level-builder div.toolbar div.creatures button.creature {
+  border: 1px solid white;
+
+  image-rendering: pixelated;
+
+  display: inline;
+
+  width: 50px;
+  height: 50px;
+  min-width: 50px;
+
+  margin: 0.1rem;
+
+  outline: none !important;
+
+  transition: transform 0.15s ease-in-out;
+}
+
+main.level-builder div.toolbar div.creatures button.creature.active {
+  border-color: gold;
+  border-width: 2px;
+
+  transform: translate(-4px, -8px) rotate(-5deg);
 }
 
 main.level-builder div.toolbar::before {
