@@ -4,6 +4,7 @@ export default class LevelBuilder {
   constructor() {
     this.buildUI();
 
+    this.btns = [];
     this.tiles = [];
     this.currentTool = null;
   }
@@ -32,6 +33,35 @@ export default class LevelBuilder {
     return this.canvas.querySelector(`button.tile:nth-child(${i + 1})`);
   }
 
+  clearTile(i) {
+    this.tiles[i] = null;
+
+    const element = this.getTile(i);
+
+    element.className = "tile";
+    element.style = null;
+  }
+
+  setTile(i) {
+    this.clearTile(i);
+    const element = this.getTile(i);
+
+    if (!isNaN(this.currentTool)) {
+      this.tiles[i] = this.currentTool;
+
+      if (this.currentTool === 1) element.classList.toggle("exit", true);
+      else if (this.currentTool === 2) {
+        element.style.setProperty("--icon", Board.wallTexture);
+        element.classList.toggle("wall", true);
+      } else if (this.currentTool === 3) {
+        element.classList.toggle("wall", true);
+        element.classList.toggle("hidden", true);
+      }
+    } else {
+      this.tiles[i] = this.currentTool;
+    }
+  }
+
   rebuildTiles() {
     const [width, height] = this.size;
 
@@ -41,14 +71,18 @@ export default class LevelBuilder {
       for (let x = 0; x < width; x++) {
         const tile = document.createElement("button");
         tile.className = "tile";
-        tile.oncontextmenu = (e) => {
-          this.rightClick(this.toIndex(x, y));
-        };
-        tile.onclick = (e) => {
+
+        tile.onmouseenter = (e) => {
           e.stopPropagation();
 
-          this.leftClick(this.toIndex(x, y));
+          if (this.btns[0]) this.leftClick(this.toIndex(x, y));
+          else if (this.btns[2]) this.rightClick(this.toIndex(x, y));
         };
+        tile.onmousedown = (e) => {
+          if (e.button === 0) this.leftClick(this.toIndex(x, y));
+          else if (e.button === 2) this.rightClick(this.toIndex(x, y));
+        };
+
         tile.onmouseover = () => {
           if (this.currentTool)
             this.tooltip.innerHTML = "Click to set. Right click to clear.";
@@ -80,9 +114,17 @@ export default class LevelBuilder {
       e.stopPropagation();
     };
 
+    canvasContainer.onmousedown = (e) => {
+      this.btns[e.button] = true;
+    };
+
+    canvasContainer.onmouseup = (e) => {
+      this.btns[e.button] = false;
+    };
+
     this.canvas = document.createElement("div");
     this.canvas.className = "canvas";
-    this.canvas.style.setProperty("--scale", 1);
+    this.canvas.style.setProperty("--scale", 1.5);
     this.canvas.style.setProperty("--transform-x", 0.5);
     this.canvas.style.setProperty("--transform-y", 0.5);
     canvasContainer.appendChild(this.canvas);
@@ -101,6 +143,18 @@ export default class LevelBuilder {
       );
     };
 
+    // Create context menu
+    this.contextMenu = document.createElement("header");
+    this.contextMenu.className = "context-menu";
+    document.body.children[0].appendChild(this.contextMenu);
+
+    const fileButton = document.createElement("button");
+    fileButton.className = "default";
+    fileButton.innerHTML = "File";
+    fileButton.disabled = true;
+
+    this.contextMenu.appendChild(fileButton);
+
     // Create tooling
     this.toolbar = document.createElement("div");
     this.toolbar.className = "toolbar";
@@ -108,9 +162,37 @@ export default class LevelBuilder {
 
     const tools = [
       {
+        icon: `url(${new URL(
+          `assets/images/animals/mouse.png`,
+          document.baseURI,
+        )}) `,
+        backgroundSize: "400%",
+        activator: () => {
+          this.currentTool = "mouse";
+        },
+      },
+      {
+        icon: `url(${new URL(
+          `assets/images/goblins/grunt.png`,
+          document.baseURI,
+        )})`,
+        backgroundSize: "500%",
+        activator: () => {
+          this.currentTool = "grunt";
+        },
+      },
+      {
         icon: Board.wallTexture,
+        backgroundSize: "50%",
         activator: () => {
           this.currentTool = 2;
+        },
+      },
+      {
+        icon: `url(${new URL(`assets/images/hidden.png`, document.baseURI)}) `,
+        backgroundSize: "100%",
+        activator: () => {
+          this.currentTool = 3;
         },
       },
       {
@@ -127,8 +209,17 @@ export default class LevelBuilder {
       toolButton.className = "tool";
 
       if (tool.icon) toolButton.style.setProperty("--icon", tool.icon);
+      if (tool.backgroundSize)
+        toolButton.style.backgroundSize = tool.backgroundSize;
       if (tool.border) toolButton.style.borderColor = tool.border;
-      toolButton.onclick = tool.activator;
+      toolButton.onclick = () => {
+        tool.activator();
+
+        this.toolbar
+          .querySelector("button.active")
+          ?.classList.toggle("active", false);
+        toolButton.classList.toggle("active", true);
+      };
 
       this.toolbar.appendChild(toolButton);
     }
@@ -142,10 +233,10 @@ export default class LevelBuilder {
   }
 
   rightClick(i) {
-    console.log("r", i);
+    this.clearTile(i);
   }
 
   leftClick(i) {
-    console.log("l", i);
+    this.setTile(i);
   }
 }

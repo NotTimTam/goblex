@@ -26,6 +26,9 @@ main.level-builder div.canvas {
   left: calc(100% * var(--transform-y, 0.5));
 
   transform: translate(-50%, -50%) scale(var(--scale, 1));
+
+  border: 1px solid #151515;
+  padding: 0.25rem;
 }
 
 main.level-builder div.canvas button.tile {
@@ -35,8 +38,23 @@ main.level-builder div.canvas button.tile {
   height: 100%;
 }
 
+main.level-builder div.canvas button.tile.exit {
+  border-color: #559955;
+  background-color: #5599553c;
+}
+
+main.level-builder div.canvas button.tile.wall:not(.hidden) {
+  background: var(--icon);
+  background-size: 50%;
+}
+
+main.level-builder div.canvas button.tile.wall.hidden {
+  border-color: transparent;
+}
+
 main.level-builder div.canvas button.tile:hover {
-  border-color: var(--accent);
+  border-color: var(--accent) !important;
+  background-color: #151515;
 }
 
 main.level-builder div.toolbar {
@@ -61,19 +79,42 @@ main.level-builder div.toolbar button.tool {
   border: 1px solid white;
 
   background: var(--icon);
+  image-rendering: pixelated;
 
   width: 50px;
   height: 50px;
+}
+
+main.level-builder div.toolbar button.tool.active {
+  border-color: gold;
+  border-width: 2px;
 }
 
 main.level-builder div.toolbar button.tool:hover {
   border-color: dodgerblue;
 }
 
+/* Tooltip */
 main.level-builder p.tooltip {
   position: absolute;
   bottom: 0;
   left: 0;
 
   margin: 0 0 0.5rem 0.5rem;
+}
+
+/* Context menu */
+main.level-builder header.context-menu {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  padding: 0.2rem;
+
+  background-color: #151515;
+}
+
+main.level-builder header.context-menu button {
+  text-transform: unset;
+  padding: 0.25rem 0.75rem;
 }
