@@ -340,6 +340,7 @@ export default class LevelBuilder {
         toolButton.style.backgroundSize = tool.backgroundSize;
       if (tool.border) toolButton.style.borderColor = tool.border;
       toolButton.onclick = () => {
+        if (tool.icon) toolButton.style.setProperty("--icon", tool.icon);
         this.toolbar.querySelector("div.creatures")?.remove();
 
         tool.activator(toolButton);
