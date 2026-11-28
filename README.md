@@ -9,3 +9,6 @@
 - MORE LEVELS!
 - Level/pack builder
 - Dialogue trees
+- Remove dead goblins/animals from the board.
+- Levels with unique shapes (not strictly rectangles)
+- Auto select animal on start of turn if only one is on the board.

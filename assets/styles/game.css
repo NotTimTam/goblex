@@ -114,7 +114,7 @@ div.board button.tile.wall {
   cursor: not-allowed;
 }
 
-div.board button.tile.dead {
+div.board button.tile.dead span.sprite {
   opacity: 0.5;
 }
 
