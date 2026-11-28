@@ -1,3 +1,4 @@
+import { animals, goblins } from "../util/creatures.js";
 import Board from "./Board.js";
 
 export default class LevelBuilder {
@@ -58,7 +59,19 @@ export default class LevelBuilder {
         element.classList.toggle("hidden", true);
       }
     } else {
-      this.tiles[i] = this.currentTool;
+      const type =
+        (Object.keys(animals).includes(this.currentTool) && "animals") ||
+        (Object.keys(goblins).includes(this.currentTool) && "goblins");
+
+      if (type) {
+        this.tiles[i] = this.currentTool;
+        element.style.setProperty(
+          "--icon",
+          `url(${new URL(`assets/images/${type}/${this.currentTool}.png`, document.baseURI)}) `,
+        );
+        element.classList.toggle("creature", true);
+        element.classList.toggle(type, true);
+      }
     }
   }
 
@@ -189,7 +202,7 @@ export default class LevelBuilder {
         },
       },
       {
-        icon: `url(${new URL(`assets/images/hidden.png`, document.baseURI)}) `,
+        icon: `url(${new URL(`assets/images/hidden.png`, document.baseURI)})`,
         backgroundSize: "100%",
         activator: () => {
           this.currentTool = 3;

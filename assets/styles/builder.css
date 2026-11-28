@@ -48,6 +48,18 @@ main.level-builder div.canvas button.tile.wall:not(.hidden) {
   background-size: 50%;
 }
 
+main.level-builder div.canvas button.tile.creature {
+  background: var(--icon);
+  image-rendering: pixelated;
+}
+
+main.level-builder div.canvas button.tile.animals {
+  background-size: 400%;
+}
+main.level-builder div.canvas button.tile.goblins {
+  background-size: 500%;
+}
+
 main.level-builder div.canvas button.tile.wall.hidden {
   border-color: transparent;
 }
