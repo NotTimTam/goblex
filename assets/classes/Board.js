@@ -717,6 +717,10 @@ export default class Board {
           onclick: () => this.pause(),
         },
         {
+          label: "restart",
+          onclick: () => this.game.resetLevel(),
+        },
+        {
           label: "levels",
           onclick: () => (this.game.screen = "levels"),
         },
