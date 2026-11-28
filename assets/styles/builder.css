@@ -84,11 +84,22 @@ main.level-builder div.toolbar {
 
   transform: translateX(-50%);
 
-  border: 1px solid white;
+  padding-bottom: 0.75rem;
+}
 
-  margin-bottom: 0.5rem;
+main.level-builder div.toolbar::before {
+  position: absolute;
+  bottom: 0;
+  left: calc(-25% * 0.5);
+  z-index: -1;
 
-  padding: 0.25rem;
+  content: "";
+  background-color: #151515;
+  width: 125%;
+  height: 50%;
+
+  border-top-left-radius: 1rem;
+  border-top-right-radius: 1rem;
 }
 
 main.level-builder div.toolbar button.tool {

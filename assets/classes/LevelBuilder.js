@@ -253,7 +253,7 @@ export default class LevelBuilder {
     // Create tooling
     this.toolbar = document.createElement("div");
     this.toolbar.className = "toolbar";
-    document.body.children[1].appendChild(this.toolbar);
+    canvasContainer.appendChild(this.toolbar);
 
     const tools = [
       {
