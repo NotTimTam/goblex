@@ -112,10 +112,22 @@ export default class LevelBuilder {
   buildUI() {
     document.body.innerHTML = `<main class="level-builder"></main>`;
 
+    // Create context menu
+    this.contextMenu = document.createElement("header");
+    this.contextMenu.className = "context-menu";
+    document.body.prepend(this.contextMenu);
+
+    const fileButton = document.createElement("button");
+    fileButton.className = "default";
+    fileButton.innerHTML = "File";
+    fileButton.disabled = true;
+
+    this.contextMenu.appendChild(fileButton);
+
     // Create canvas
     const canvasContainer = document.createElement("div");
     canvasContainer.className = "canvas-container";
-    document.body.children[0].appendChild(canvasContainer);
+    document.body.children[1].appendChild(canvasContainer);
 
     const canvasWrapper = document.createElement("div");
     canvasWrapper.className = "canvas-wrapper";
@@ -231,22 +243,10 @@ export default class LevelBuilder {
     updateStage();
     window.addEventListener("resize", updateStage);
 
-    // Create context menu
-    this.contextMenu = document.createElement("header");
-    this.contextMenu.className = "context-menu";
-    document.body.children[0].appendChild(this.contextMenu);
-
-    const fileButton = document.createElement("button");
-    fileButton.className = "default";
-    fileButton.innerHTML = "File";
-    fileButton.disabled = true;
-
-    this.contextMenu.appendChild(fileButton);
-
     // Create tooling
     this.toolbar = document.createElement("div");
     this.toolbar.className = "toolbar";
-    document.body.children[0].appendChild(this.toolbar);
+    document.body.children[1].appendChild(this.toolbar);
 
     const tools = [
       {
@@ -314,7 +314,7 @@ export default class LevelBuilder {
 
     this.tooltip = document.createElement("p");
     this.tooltip.className = "tooltip";
-    document.body.children[0].appendChild(this.tooltip);
+    document.body.children[1].appendChild(this.tooltip);
   }
 
   rightClick(i) {
