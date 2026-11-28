@@ -8,6 +8,9 @@
 - Point shop
 - MORE LEVELS!
 - Level/pack builder
+  - Level/pack exporter
+  - In-game saving
+  - Creature stats popup
 - Dialogue trees
 - Remove dead goblins/animals from the board.
 - Levels with unique shapes (not strictly rectangles)
