@@ -8,3 +8,4 @@
 - Point shop
 - MORE LEVELS!
 - Level/pack builder
+- Dialogue trees

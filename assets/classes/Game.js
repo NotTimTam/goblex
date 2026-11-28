@@ -1,6 +1,7 @@
 import Board from "./Board.js";
 import packs from "../util/levels.js";
 import { animals, goblins } from "../util/creatures.js";
+import LevelBuilder from "./LevelBuilder.js";
 
 export default class Game {
   constructor(debug = false) {
@@ -69,12 +70,16 @@ export default class Game {
       case "menu":
         this.loadMenu();
         break;
+      case "level_builder":
+        this.loadLevelBuilder(rest || {});
+        break;
       case "levels":
         this.loadLevels(rest || {});
         break;
       case "level":
         this.loadLevel(...rest.level);
         break;
+
       default:
         this.loadError();
         break;
@@ -221,6 +226,12 @@ export default class Game {
         label: "play",
         action: () => {
           this.screen = "saves";
+        },
+      },
+      {
+        label: "level builder",
+        action: () => {
+          this.screen = "level_builder";
         },
       },
       {
@@ -479,5 +490,11 @@ export default class Game {
       this.save.levels[currentPack][currentLevel].points = points;
 
     this.saveGame();
+  }
+
+  loadLevelBuilder({}) {
+    if (this.board) this.board.cleanup();
+
+    const levelBuilder = new LevelBuilder();
   }
 }

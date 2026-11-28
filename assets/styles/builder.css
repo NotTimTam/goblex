@@ -1,0 +1,79 @@
+main.level-builder {
+  width: 100%;
+  height: 100%;
+
+  background-color: #292929;
+}
+
+main.level-builder div.canvas-container {
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+
+  position: relative;
+}
+
+main.level-builder div.canvas {
+  display: grid;
+
+  width: 256px;
+  height: 256px;
+
+  gap: 4px;
+
+  position: absolute;
+  top: calc(100% * var(--transform-x, 0.5));
+  left: calc(100% * var(--transform-y, 0.5));
+
+  transform: translate(-50%, -50%) scale(var(--scale, 1));
+}
+
+main.level-builder div.canvas button.tile {
+  border: 0.5px solid #fff;
+
+  width: 100%;
+  height: 100%;
+}
+
+main.level-builder div.canvas button.tile:hover {
+  border-color: var(--accent);
+}
+
+main.level-builder div.toolbar {
+  position: absolute;
+  top: 50%;
+  left: 0;
+
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+
+  transform: translateY(-50%);
+
+  border: 1px solid white;
+
+  margin-left: 0.5rem;
+
+  padding: 0.25rem;
+}
+
+main.level-builder div.toolbar button.tool {
+  border: 1px solid white;
+
+  background: var(--icon);
+
+  width: 50px;
+  height: 50px;
+}
+
+main.level-builder div.toolbar button.tool:hover {
+  border-color: dodgerblue;
+}
+
+main.level-builder p.tooltip {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+
+  margin: 0 0 0.5rem 0.5rem;
+}
